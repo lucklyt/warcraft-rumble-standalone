@@ -1,0 +1,18 @@
+{
+  "name": "warcraft-rumble-standalone",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "《魔兽大作战》本地独立单机版 - 奥妮克希亚的巢穴深度战斗垂直切片",
+  "scripts": {
+    "sync-assets": "node scripts/sync-assets.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "deploy": "npm run build && node scripts/deploy-pages.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "vite": "^8.0.12"
+  }
+}
