@@ -1,0 +1,532 @@
+{
+  "CombatHUD_Tex_Tutorial_Miner_Player": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_Miner_Player.webp",
+    "width": 102,
+    "height": 132
+  },
+  "CombatHUD_Tex_Tray_Emote": {
+    "file": "./r/hud/CombatHUD_Tex_Tray_Emote.webp",
+    "width": 256,
+    "height": 224
+  },
+  "CombatHUD_Tex_Tutorial_RPSDiagram": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_RPSDiagram.webp",
+    "width": 256,
+    "height": 237
+  },
+  "CombatHUD_Tex_InfoIcon_Type_FlyingTip": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_FlyingTip.webp",
+    "width": 62,
+    "height": 41
+  },
+  "CombatHUD_Tex_Pvp_SwordBlue": {
+    "file": "./r/hud/CombatHUD_Tex_Pvp_SwordBlue.webp",
+    "width": 42,
+    "height": 127
+  },
+  "CombatHUD_Tex_Tutorial_DeployRanged": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_DeployRanged.webp",
+    "width": 150,
+    "height": 150
+  },
+  "CombatHUD_Tex_Tray_Hole": {
+    "file": "./r/hud/CombatHUD_Tex_Tray_Hole.webp",
+    "width": 237,
+    "height": 85
+  },
+  "CombatHUD_Tex_PlayerPanel_MeterFill_Enemy": {
+    "file": "./r/hud/CombatHUD_Tex_PlayerPanel_MeterFill_Enemy.webp",
+    "width": 56,
+    "height": 56
+  },
+  "CombatHUD_Tex_TimerBtn": {
+    "file": "./r/hud/CombatHUD_Tex_TimerBtn.webp",
+    "width": 50,
+    "height": 49
+  },
+  "CombatHUD_Tex_AvatarFrame": {
+    "file": "./r/hud/CombatHUD_Tex_AvatarFrame.webp",
+    "width": 207,
+    "height": 226
+  },
+  "CombatHUD_Tex_Vignette": {
+    "file": "./r/hud/CombatHUD_Tex_Vignette.webp",
+    "width": 256,
+    "height": 206
+  },
+  "CombatHUD_Tex_GoldMeter_Shine_Wipe": {
+    "file": "./r/hud/CombatHUD_Tex_GoldMeter_Shine_Wipe.webp",
+    "width": 256,
+    "height": 28
+  },
+  "CombatHUD_Tex_PlayerPanel_BG": {
+    "file": "./r/hud/CombatHUD_Tex_PlayerPanel_BG.webp",
+    "width": 254,
+    "height": 79
+  },
+  "CombatHUD_Tex_Tray_Mask": {
+    "file": "./r/hud/CombatHUD_Tex_Tray_Mask.webp",
+    "width": 230,
+    "height": 256
+  },
+  "CombatHUD_Tex_Raid_Pip": {
+    "file": "./r/hud/CombatHUD_Tex_Raid_Pip.webp",
+    "width": 102,
+    "height": 118
+  },
+  "CombatHUD_Tex_StartButton_Glow": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_Glow.webp",
+    "width": 240,
+    "height": 240
+  },
+  "CombatHUD_Tex_Emote_Arrow": {
+    "file": "./r/hud/CombatHUD_Tex_Emote_Arrow.webp",
+    "width": 53,
+    "height": 78
+  },
+  "CombatHUD_Tex_Statue_Base_HUD_CostFrame": {
+    "file": "./r/hud/CombatHUD_Tex_Statue_Base_HUD_CostFrame.webp",
+    "width": 102,
+    "height": 65
+  },
+  "CombatHUD_Tex_Tray_HoleCover": {
+    "file": "./r/hud/CombatHUD_Tex_Tray_HoleCover.webp",
+    "width": 118,
+    "height": 43
+  },
+  "CombatHUD_Tex_InfoIcon_BlueTip": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_BlueTip.webp",
+    "width": 62,
+    "height": 41
+  },
+  "CombatHUD_Tex_StartButton_BtnBase": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_BtnBase.webp",
+    "width": 256,
+    "height": 238
+  },
+  "CombatHUD_Tex_Tutorial_Ranged_Player": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_Ranged_Player.webp",
+    "width": 102,
+    "height": 132
+  },
+  "CombatHUD_Tex_InfoIcon_Type_Flying": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_Flying.webp",
+    "width": 120,
+    "height": 100
+  },
+  "CombatHUD_Tex_Tutorial_DeployMelee": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_DeployMelee.webp",
+    "width": 150,
+    "height": 150
+  },
+  "CombatHUD_Tex_StartButton_Button": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_Button.webp",
+    "width": 173,
+    "height": 172
+  },
+  "CombatHUD_Tex_TimerButtonFrame": {
+    "file": "./r/hud/CombatHUD_Tex_TimerButtonFrame.webp",
+    "width": 143,
+    "height": 146
+  },
+  "CombatHUD_Tex_IconGear": {
+    "file": "./r/hud/CombatHUD_Tex_IconGear.webp",
+    "width": 83,
+    "height": 86
+  },
+  "CombatHUD_Tex_StartButton_ButtonPress": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_ButtonPress.webp",
+    "width": 174,
+    "height": 172
+  },
+  "CombatHUD_Tex_IconPlay": {
+    "file": "./r/hud/CombatHUD_Tex_IconPlay.webp",
+    "width": 60,
+    "height": 70
+  },
+  "CombatHUD_Tex_InfoIcon_Type_Melee": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_Melee.webp",
+    "width": 100,
+    "height": 100
+  },
+  "CombatHUD_Tex_Statue_Base_HUD_On": {
+    "file": "./r/hud/CombatHUD_Tex_Statue_Base_HUD_On.webp",
+    "width": 254,
+    "height": 98
+  },
+  "CombatHUD_Tex_Tex_Button_Frame_EmotesPvP": {
+    "file": "./r/hud/CombatHUD_Tex_Tex_Button_Frame_EmotesPvP.webp",
+    "width": 180,
+    "height": 158
+  },
+  "CombatHUD_Tex_Statue_Base_HUD_Glow": {
+    "file": "./r/hud/CombatHUD_Tex_Statue_Base_HUD_Glow.webp",
+    "width": 256,
+    "height": 71
+  },
+  "CombatHUD_Tex_HotkeyIndicator": {
+    "file": "./r/hud/CombatHUD_Tex_HotkeyIndicator.webp",
+    "width": 69,
+    "height": 79
+  },
+  "CombatHUD_Tex_StartButton_Frame_Shine": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_Frame_Shine.webp",
+    "width": 204,
+    "height": 190
+  },
+  "CombatHUD_Tex_OffscreenIndicator_WipeMask": {
+    "file": "./r/hud/CombatHUD_Tex_OffscreenIndicator_WipeMask.webp",
+    "width": 256,
+    "height": 256
+  },
+  "CombatHUD_Tex_GoldNugget": {
+    "file": "./r/hud/CombatHUD_Tex_GoldNugget.webp",
+    "width": 83,
+    "height": 63
+  },
+  "CombatHUD_Tex_Pvp_SwordRed": {
+    "file": "./r/hud/CombatHUD_Tex_Pvp_SwordRed.webp",
+    "width": 42,
+    "height": 127
+  },
+  "CombatHUD_Tex_FeatureDisplay_Bounty": {
+    "file": "./r/hud/CombatHUD_Tex_FeatureDisplay_Bounty.webp",
+    "width": 234,
+    "height": 191
+  },
+  "CombatHUD_Tex_Tutorial_DeployMiner": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_DeployMiner.webp",
+    "width": 150,
+    "height": 150
+  },
+  "CombatHUD_Tex_Handshake_Icon": {
+    "file": "./r/hud/CombatHUD_Tex_Handshake_Icon.webp",
+    "width": 104,
+    "height": 100
+  },
+  "CombatHUD_Tex_CoopHandshake": {
+    "file": "./r/hud/CombatHUD_Tex_CoopHandshake.webp",
+    "width": 79,
+    "height": 81
+  },
+  "CombatHUD_Tex_IconRestart": {
+    "file": "./r/hud/CombatHUD_Tex_IconRestart.webp",
+    "width": 78,
+    "height": 72
+  },
+  "CombatHUD_Tex_TimerFrame": {
+    "file": "./r/hud/CombatHUD_Tex_TimerFrame.webp",
+    "width": 249,
+    "height": 115
+  },
+  "CombatHUD_Tex_GoldMeter_FrontFace": {
+    "file": "./r/hud/CombatHUD_Tex_GoldMeter_FrontFace.webp",
+    "width": 512,
+    "height": 41
+  },
+  "CombatHUD_Tex_Statue_Base_HUD_CostShadow": {
+    "file": "./r/hud/CombatHUD_Tex_Statue_Base_HUD_CostShadow.webp",
+    "width": 101,
+    "height": 22
+  },
+  "CombatHUD_Tex_EmoteUI_Button": {
+    "file": "./r/hud/CombatHUD_Tex_EmoteUI_Button.webp",
+    "width": 232,
+    "height": 142
+  },
+  "CombatHUD_Tex_PauseIndicator": {
+    "file": "./r/hud/CombatHUD_Tex_PauseIndicator.webp",
+    "width": 26,
+    "height": 26
+  },
+  "CombatHUD_Tex_IconSettings": {
+    "file": "./r/hud/CombatHUD_Tex_IconSettings.webp",
+    "width": 67,
+    "height": 67
+  },
+  "CombatHUD_Tex_Tutorial_Flying_Player": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_Flying_Player.webp",
+    "width": 102,
+    "height": 132
+  },
+  "CombatHUD_Tex_InfoIcon_BlueCenter": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_BlueCenter.webp",
+    "width": 100,
+    "height": 100
+  },
+  "CombatHUD_Tex_StartButton_RightPlate": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_RightPlate.webp",
+    "width": 129,
+    "height": 161
+  },
+  "CombatHUD_Tex_OffscreenIndicator": {
+    "file": "./r/hud/CombatHUD_Tex_OffscreenIndicator.webp",
+    "width": 163,
+    "height": 163
+  },
+  "CombatHUD_Tex_Player_Default": {
+    "file": "./r/hud/CombatHUD_Tex_Player_Default.webp",
+    "width": 251,
+    "height": 200
+  },
+  "CombatHUD_Tex_BotLetterBox": {
+    "file": "./r/hud/CombatHUD_Tex_BotLetterBox.webp",
+    "width": 142,
+    "height": 256
+  },
+  "CombatHUD_Tex_Statue_Base_HUD_Pose": {
+    "file": "./r/hud/CombatHUD_Tex_Statue_Base_HUD_Pose.webp",
+    "width": 239,
+    "height": 120
+  },
+  "CombatHUD_Tex_Tray_Corner": {
+    "file": "./r/hud/CombatHUD_Tex_Tray_Corner.webp",
+    "width": 158,
+    "height": 135
+  },
+  "CombatHUD_Tex_PlayerPanel_DelayFill": {
+    "file": "./r/hud/CombatHUD_Tex_PlayerPanel_DelayFill.webp",
+    "width": 56,
+    "height": 56
+  },
+  "CombatHUD_Tex_Tutorial_Melee_Player": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_Melee_Player.webp",
+    "width": 102,
+    "height": 132
+  },
+  "CombatHUD_Tex_SoftCapsule": {
+    "file": "./r/hud/CombatHUD_Tex_SoftCapsule.webp",
+    "width": 107,
+    "height": 109
+  },
+  "CombatHUD_Tex_GoldMeter_FractionFill": {
+    "file": "./r/hud/CombatHUD_Tex_GoldMeter_FractionFill.webp",
+    "width": 60,
+    "height": 60
+  },
+  "CombatHUD_Tex_Tray_NextPanel": {
+    "file": "./r/hud/CombatHUD_Tex_Tray_NextPanel.webp",
+    "width": 240,
+    "height": 256
+  },
+  "CombatHUD_Tex_GoldMeter_Handle": {
+    "file": "./r/hud/CombatHUD_Tex_GoldMeter_Handle.webp",
+    "width": 22,
+    "height": 32
+  },
+  "CombatHUD_Tex_InfoIcon_Type_Ranged": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_Ranged.webp",
+    "width": 100,
+    "height": 100
+  },
+  "CombatHUD_Tex_InfoIcon_Shadow": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Shadow.webp",
+    "width": 104,
+    "height": 128
+  },
+  "CombatHUD_Tex_PlayerPanel_MeterFill": {
+    "file": "./r/hud/CombatHUD_Tex_PlayerPanel_MeterFill.webp",
+    "width": 56,
+    "height": 56
+  },
+  "CombatHUD_Tex_Icon_Chat": {
+    "file": "./r/hud/CombatHUD_Tex_Icon_Chat.webp",
+    "width": 224,
+    "height": 198
+  },
+  "CombatHUD_Tex_PauseMenu_Mask": {
+    "file": "./r/hud/CombatHUD_Tex_PauseMenu_Mask.webp",
+    "width": 162,
+    "height": 162
+  },
+  "CombatHUD_Tex_Raid_Unactive_Pip": {
+    "file": "./r/hud/CombatHUD_Tex_Raid_Unactive_Pip.webp",
+    "width": 112,
+    "height": 127
+  },
+  "CombatHUD_Tex_InfoIcon_Type_Miner": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_Miner.webp",
+    "width": 100,
+    "height": 100
+  },
+  "CombatHUD_Tex_IconPause": {
+    "file": "./r/hud/CombatHUD_Tex_IconPause.webp",
+    "width": 55,
+    "height": 67
+  },
+  "CombatHUD_Tex_GoldMeter_ShineMask": {
+    "file": "./r/hud/CombatHUD_Tex_GoldMeter_ShineMask.webp",
+    "width": 505,
+    "height": 46
+  },
+  "CombatHUD_Tex_StartButton_Pillar": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_Pillar.webp",
+    "width": 116,
+    "height": 256
+  },
+  "CombatHUD_Tex_StartButton_Frame": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_Frame.webp",
+    "width": 206,
+    "height": 192
+  },
+  "CombatHUD_Tex_InfoIcon_Type_RangedTip": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_RangedTip.webp",
+    "width": 62,
+    "height": 41
+  },
+  "CombatHUD_Tex_OffscreenIndicator_Arrow": {
+    "file": "./r/hud/CombatHUD_Tex_OffscreenIndicator_Arrow.webp",
+    "width": 79,
+    "height": 86
+  },
+  "CombatHUD_Tex_Tutorial_DeployFlying": {
+    "file": "./r/hud/CombatHUD_Tex_Tutorial_DeployFlying.webp",
+    "width": 150,
+    "height": 150
+  },
+  "CombatHUD_Tex_GoldNugget_Highlight": {
+    "file": "./r/hud/CombatHUD_Tex_GoldNugget_Highlight.webp",
+    "width": 94,
+    "height": 74
+  },
+  "CombatHUD_Tex_EmoteUI_Button_Shadow": {
+    "file": "./r/hud/CombatHUD_Tex_EmoteUI_Button_Shadow.webp",
+    "width": 231,
+    "height": 130
+  },
+  "CombatHUD_Tex_InfoIcon_Type_MinerTip": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_MinerTip.webp",
+    "width": 62,
+    "height": 41
+  },
+  "CombatHUD_Tex_InfoIcon_Type_MeleeTip": {
+    "file": "./r/hud/CombatHUD_Tex_InfoIcon_Type_MeleeTip.webp",
+    "width": 62,
+    "height": 41
+  },
+  "CombatHUD_Tex_StartButton_LeftPlate": {
+    "file": "./r/hud/CombatHUD_Tex_StartButton_LeftPlate.webp",
+    "width": 129,
+    "height": 160
+  },
+  "UnitOwnership_ArmorFill": {
+    "file": "./r/hud/UnitOwnership_ArmorFill.webp",
+    "width": 36,
+    "height": 32
+  },
+  "CombatHUD_UnitLevels_4": {
+    "file": "./r/hud/CombatHUD_UnitLevels_4.webp",
+    "width": 28,
+    "height": 32
+  },
+  "CombatHUD_UnitLevels_6": {
+    "file": "./r/hud/CombatHUD_UnitLevels_6.webp",
+    "width": 27,
+    "height": 33
+  },
+  "CombatHUD_UnitLevels_2": {
+    "file": "./r/hud/CombatHUD_UnitLevels_2.webp",
+    "width": 25,
+    "height": 33
+  },
+  "CombatHUD_UnitLevels_9": {
+    "file": "./r/hud/CombatHUD_UnitLevels_9.webp",
+    "width": 27,
+    "height": 34
+  },
+  "CombatHUD_UnitLevels_8": {
+    "file": "./r/hud/CombatHUD_UnitLevels_8.webp",
+    "width": 25,
+    "height": 34
+  },
+  "UnitHealthMeter_BossLvBG": {
+    "file": "./r/hud/UnitHealthMeter_BossLvBG.webp",
+    "width": 32,
+    "height": 32
+  },
+  "UnitHealthMeter_Fill": {
+    "file": "./r/hud/UnitHealthMeter_Fill.webp",
+    "width": 28,
+    "height": 28
+  },
+  "UnitOwnership_MagicFill": {
+    "file": "./r/hud/UnitOwnership_MagicFill.webp",
+    "width": 38,
+    "height": 28
+  },
+  "UnitHealthMeter_FillBG": {
+    "file": "./r/hud/UnitHealthMeter_FillBG.webp",
+    "width": 32,
+    "height": 32
+  },
+  "UnitOwnership_ExposeFrame": {
+    "file": "./r/hud/UnitOwnership_ExposeFrame.webp",
+    "width": 50,
+    "height": 54
+  },
+  "UnitHealthMeter_MiniBossBG": {
+    "file": "./r/hud/UnitHealthMeter_MiniBossBG.webp",
+    "width": 69,
+    "height": 46
+  },
+  "UnitHealthMeter_BossBG": {
+    "file": "./r/hud/UnitHealthMeter_BossBG.webp",
+    "width": 76,
+    "height": 46
+  },
+  "CombatHUD_UnitLevels_3": {
+    "file": "./r/hud/CombatHUD_UnitLevels_3.webp",
+    "width": 24,
+    "height": 34
+  },
+  "CombatHUD_UnitLevels_5": {
+    "file": "./r/hud/CombatHUD_UnitLevels_5.webp",
+    "width": 25,
+    "height": 33
+  },
+  "UnitOwnership_VulnFrame": {
+    "file": "./r/hud/UnitOwnership_VulnFrame.webp",
+    "width": 62,
+    "height": 62
+  },
+  "UnitHealthMeter_BGFramed": {
+    "file": "./r/hud/UnitHealthMeter_BGFramed.webp",
+    "width": 78,
+    "height": 40
+  },
+  "UnitOwnership_ArmorFrame": {
+    "file": "./r/hud/UnitOwnership_ArmorFrame.webp",
+    "width": 50,
+    "height": 54
+  },
+  "UnitOwnership_MagicFrame": {
+    "file": "./r/hud/UnitOwnership_MagicFrame.webp",
+    "width": 52,
+    "height": 52
+  },
+  "CombatHUD_UnitLevels_1": {
+    "file": "./r/hud/CombatHUD_UnitLevels_1.webp",
+    "width": 24,
+    "height": 33
+  },
+  "CombatHUD_UnitLevels_7": {
+    "file": "./r/hud/CombatHUD_UnitLevels_7.webp",
+    "width": 25,
+    "height": 32
+  },
+  "CombatHUD_UnitLevels_0": {
+    "file": "./r/hud/CombatHUD_UnitLevels_0.webp",
+    "width": 28,
+    "height": 34
+  },
+  "UnitHealthMeter_BaseBG": {
+    "file": "./r/hud/UnitHealthMeter_BaseBG.webp",
+    "width": 85,
+    "height": 46
+  },
+  "UnitHealthMeter_BG": {
+    "file": "./r/hud/UnitHealthMeter_BG.webp",
+    "width": 40,
+    "height": 40
+  }
+}
