@@ -1,180 +1,342 @@
-export const MAP_WIDTH = 36;
-export const MAP_HEIGHT = 64;
-export const PHASE_CLEAR_Y = 26.5;
+import missionData from '../data/onyxia-mission-data.json' with { type: 'json' };
 
-export const ONYXIA_POS = { x: 18.0, y: 9.5, radius: 3.1 };
-export const PLAYER_BASE_POS = { x: 18.0, y: 55.0, radius: 2.6 };
+export const CAMERA_BOUNDS = missionData.cameraBounds || { cx: 0, cz: 39, width: 56, depth: 114 };
+
+export const ARENA_BOUNDS = {
+  xMin: -25.5,
+  xMax: 25.5,
+  zMin: -6.5,
+  zMax: 84.5,
+};
+
+export const MAP_WIDTH = CAMERA_BOUNDS.width; // 56
+export const MAP_HEIGHT = CAMERA_BOUNDS.depth; // 114
+
+export const ONYXIA_POS = { x: 0.0, z: 78.5, radius: 8.0 };
+export const PLAYER_BASE_POS = { x: 0.0, z: 0.0, radius: 3.2 };
+
+// Official Onyxia BoardWipe relativeRadius=39 + Onyxia collider radius=8 -> 47m from (0, 78.5)
+export const PHASE_WIPE_RADIUS = 47.0;
+
+// 4 authentic volcanic unwalkable islands extracted from mission_onyxia.bundle
+export const UNWALKABLE_OBSTACLES = missionData.unwalkables || [];
+
+const unitByName = new Map(missionData.units.map((u) => [u.name, u]));
+const roadByGuid = new Map(missionData.roads.map((r) => [r.guid, r]));
+const roadByName = new Map(missionData.roads.map((r) => [r.name, r]));
+
+function getUnitPos(name, fallbackX, fallbackZ) {
+  const u = unitByName.get(name);
+  if (!u) return { x: fallbackX, z: fallbackZ };
+  return { x: u.x, z: u.z };
+}
 
 export const INITIAL_STRUCTURES = [
   {
     id: 'player-base',
+    guid: unitByName.get('HomeBase')?.guid || 'd316f315c39d482c87dfbd9a4a5a036d',
     kind: 'base',
     nameZh: '联盟主基地',
     team: 'player',
-    x: 18.0,
-    y: 55.0,
-    radius: 2.6,
-    maxHp: 5500,
-    range: 9.5,
-    damage: 185,
+    x: PLAYER_BASE_POS.x,
+    z: PLAYER_BASE_POS.z,
+    radius: PLAYER_BASE_POS.radius,
+    maxHp: 5800,
+    range: 11.5,
+    damage: 195,
     attackInterval: 1.35,
-    splashRadius: 1.8,
+    splashRadius: 2.2,
     resetsOnPhase: false,
-    deployRadius: 7.5,
   },
   {
     id: 'tower-mid',
+    guid: unitByName.get('Tower 1')?.guid || 'a3e271ba03014d8d88deb137dd551bdd',
     kind: 'tower',
     nameZh: '中路要塞哨塔',
     team: 'enemy',
-    x: 18.0,
-    y: 31.5,
-    radius: 1.9,
-    maxHp: 1800,
-    range: 9.5,
-    damage: 125,
+    ...getUnitPos('Tower 1', -2, 25),
+    radius: 2.3,
+    maxHp: 1900,
+    range: 11.0,
+    damage: 135,
     attackInterval: 1.4,
-    resetsOnPhase: false, // Below PHASE_CLEAR_Y (26.5) -> survives phase transitions!
-    deployRadius: 5.8,
+    // Distance from (0, 78.5) is 53.54 > PHASE_WIPE_RADIUS (47.0) -> survives P2/P3 wipe!
+    resetsOnPhase: false,
   },
   {
     id: 'tower-left',
+    guid: unitByName.get('Tower 2')?.guid || '4a3ec2d63b5d479583ad0e38bee67ffa',
     kind: 'tower',
-    nameZh: '左翼龙巢哨塔',
+    nameZh: '西翼龙巢哨塔',
     team: 'enemy',
-    x: 11.2,
-    y: 21.5,
-    radius: 1.9,
-    maxHp: 1800,
-    range: 9.5,
-    damage: 125,
+    ...getUnitPos('Tower 2', -12, 44),
+    radius: 2.3,
+    maxHp: 1900,
+    range: 11.0,
+    damage: 135,
     attackInterval: 1.4,
-    resetsOnPhase: true, // Above PHASE_CLEAR_Y -> wiped & reclaimed by Onyxia at 70% & 40%
-    deployRadius: 5.8,
+    // Distance from (0, 78.5) is 36.53 <= 47.0 -> wiped & reclaimed by Onyxia!
+    resetsOnPhase: true,
   },
   {
     id: 'tower-right',
+    guid: unitByName.get('Tower 3')?.guid || 'd157ae335d2045cb83c56fc2bc83432b',
     kind: 'tower',
-    nameZh: '右翼龙巢哨塔',
+    nameZh: '东翼龙巢哨塔',
     team: 'enemy',
-    x: 24.8,
-    y: 21.5,
-    radius: 1.9,
-    maxHp: 1800,
-    range: 9.5,
-    damage: 125,
+    ...getUnitPos('Tower 3', 12, 50),
+    radius: 2.3,
+    maxHp: 1900,
+    range: 11.0,
+    damage: 135,
     attackInterval: 1.4,
-    resetsOnPhase: true, // Above PHASE_CLEAR_Y -> wiped & reclaimed by Onyxia at 70% & 40%
-    deployRadius: 5.8,
+    // Distance from (0, 78.5) is 30.92 <= 47.0 -> wiped & reclaimed by Onyxia!
+    resetsOnPhase: true,
   },
 ];
 
-export const INITIAL_MINES = [
-  { id: 'mine-left', x: 7.2, y: 34.0, gold: 2, maxGold: 3, regenTimer: 0, regenInterval: 15 },
-  { id: 'mine-right', x: 29.0, y: 38.0, gold: 2, maxGold: 3, regenTimer: 0, regenInterval: 15 },
-  { id: 'mine-mid', x: 22.5, y: 25.5, gold: 2, maxGold: 3, regenTimer: 0, regenInterval: 15 },
-  { id: 'mine-top-left', x: 11.0, y: 16.0, gold: 2, maxGold: 3, regenTimer: 0, regenInterval: 15 },
-];
+export const INITIAL_MINES = [1, 2, 3, 4].map((idx) => {
+  const name = `Gold Mine ${idx}`;
+  const pos = getUnitPos(name, 0, 24);
+  return {
+    id: `mine-${idx}`,
+    name,
+    x: pos.x,
+    z: pos.z,
+    gold: 2,
+    maxGold: 3,
+    regenTimer: 0,
+    regenInterval: 16,
+  };
+});
 
-export const INITIAL_CHESTS = [
-  { id: 'chest-bottom', x: 20.2, y: 41.5, hp: 200, maxHp: 200, alive: true, respawnTimer: 0, respawnInterval: 45, reward: 2 },
-  { id: 'chest-top', x: 18.0, y: 20.5, hp: 200, maxHp: 200, alive: true, respawnTimer: 0, respawnInterval: 45, reward: 2 },
-];
+export const INITIAL_CHESTS = [1, 2].map((idx) => {
+  const name = `Treasure Chest ${idx}`;
+  const pos = getUnitPos(name, 0, 20);
+  return {
+    id: `chest-${idx}`,
+    name,
+    x: pos.x,
+    z: pos.z,
+    hp: 200,
+    maxHp: 200,
+    alive: true,
+    respawnTimer: 0,
+    respawnInterval: 45,
+    reward: 2,
+  };
+});
 
-export const WHELP_EGG_NESTS = {
-  left: [
-    { x: 7.5, y: 38.8 },
-    { x: 9.2, y: 38.4 },
-    { x: 8.4, y: 40.4 },
-  ],
-  right: [
-    { x: 26.6, y: 41.6 },
-    { x: 28.4, y: 41.3 },
-    { x: 27.5, y: 43.3 },
-  ],
+export const WHELP_EGG_SPAWNERS = {
+  left: missionData.units
+    .filter((u) => u.name.startsWith('Egg Spawner 1-'))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((u) => ({ name: u.name, x: u.x, z: u.z })),
+  right: missionData.units
+    .filter((u) => u.name.startsWith('Egg Spawner 2-'))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((u) => ({ name: u.name, x: u.x, z: u.z })),
 };
 
-export const WARDER_CAVES = {
-  left: { x: 7.0, y: 14.0, nodeId: 'L_TOP' },
-  right: { x: 29.0, y: 14.0, nodeId: 'R_TOP' },
-};
+export const ELEMENTAL_CAVEIN_SPAWNERS = [1, 2, 3, 4].map((idx) => {
+  const pos = getUnitPos(`CaveIn Elemental Spawner ${idx}`, 0, 45);
+  return { id: `cavein-elem-${idx}`, x: pos.x, z: pos.z };
+});
 
-// Elliptical lava obstacles blocking ground unit walking/placement (flying & spells ignore)
-export const LAVA_OBSTACLES = [
-  { id: 'lava-left', cx: 12.6, cy: 39.2, rx: 2.3, ry: 6.2 },
-  { id: 'lava-mid', cx: 18.2, cy: 25.4, rx: 2.8, ry: 2.3 },
-  { id: 'lava-right', cx: 23.2, cy: 42.6, rx: 3.1, ry: 3.9 },
-];
+export const WARDER_CAVEIN_SPAWNERS = [1, 2].map((idx) => {
+  const pos = getUnitPos(`CaveIn Warder Spawner ${idx}`, idx === 1 ? -6 : 6, 65);
+  return {
+    id: `cavein-warder-${idx}`,
+    x: pos.x,
+    z: pos.z,
+    nodeId: idx === 1 ? roadByName.get('West Path 11')?.guid : roadByName.get('East Path 12')?.guid,
+  };
+});
+
+// Interactive switches combining Blizzard's 3 mission switches + Tower 1 forward fork
+const eastSw = missionData.switches.find((s) => s.name === 'East Lane Switch');
+const t2Sw = missionData.switches.find((s) => s.name === 'Tower 2 Switch');
+const t3Sw = missionData.switches.find((s) => s.name === 'Tower 3 Switch');
 
 export const INITIAL_SWITCHES = {
-  'switch-bottom': { id: 'switch-bottom', x: 18.0, y: 47.5, dir: 'left', label: '底路分岔' },
-  'switch-mid': { id: 'switch-mid', x: 20.5, y: 43.0, dir: 'left', label: '中右分岔' },
-  'switch-upper': { id: 'switch-upper', x: 18.0, y: 27.5, dir: 'left', label: '上路合流' },
+  'switch-tower-1': {
+    id: 'switch-tower-1',
+    name: 'Tower 1 Fork',
+    label: '中塔分岔',
+    x: -2.0,
+    z: 27.6,
+    dir: 'left', // left -> Middle Path 4 (-7.5, 32), right -> Mid to East Traverse (6, 27.5)
+    leftRoad: roadByName.get('Middle Path 4')?.guid,
+    rightRoad: roadByName.get('Mid to East Traverse')?.guid,
+  },
+  'switch-east-lane': {
+    id: 'switch-east-lane',
+    name: eastSw?.name || 'East Lane Switch',
+    label: '东路合流岔道',
+    x: eastSw?.x ?? 12.5,
+    z: eastSw?.z ?? 32.0,
+    dir: 'right', // For enemy TowardsBottom at East Path 6: left -> Mid to East Traverse, right -> East Path 5
+    leftRoad: roadByName.get('Mid to East Traverse')?.guid,
+    rightRoad: roadByName.get('East Path 5')?.guid,
+  },
+  'switch-tower-2': {
+    id: 'switch-tower-2',
+    name: t2Sw?.name || 'Tower 2 Switch',
+    label: '西塔岔道',
+    x: t2Sw?.x ?? -12.0,
+    z: t2Sw?.z ?? 44.0,
+    dir: 'right', // At Middle Path 5: left -> West Path 7 (west flank), right -> Middle Path 6
+    leftRoad: roadByName.get('West Path 6')?.guid,
+    rightRoad: roadByName.get('Middle Path 5')?.guid,
+  },
+  'switch-tower-3': {
+    id: 'switch-tower-3',
+    name: t3Sw?.name || 'Tower 3 Switch',
+    label: '东塔岔道',
+    x: t3Sw?.x ?? 12.0,
+    z: t3Sw?.z ?? 50.0,
+    dir: 'right', // At East Path 10/Middle Path 8: left -> Middle Path 8, right -> East Path 9
+    leftRoad: roadByName.get('Middle Path 8')?.guid,
+    rightRoad: roadByName.get('East Path 9')?.guid,
+  },
+};
+
+// Build complete acyclic directed waypoint graph for both TowardsTop & TowardsBottom
+const BOTTOM_FALLBACKS = {
+  'East Path 11': roadByName.get('East Path 10')?.guid,
+  'Middle Path 7': roadByName.get('Middle Path 6')?.guid,
+  'West Path 8': roadByName.get('West Path 7')?.guid,
+  'East Path 6': roadByName.get('East Path 5')?.guid,
 };
 
 export const WAYPOINT_NODES = {
-  P_BASE: { id: 'P_BASE', x: 18.0, y: 55.0, nextPlayer: 'SW_BOT', nextEnemy: null },
-  SW_BOT: { id: 'SW_BOT', x: 18.0, y: 47.5, switchId: 'switch-bottom', left: 'L1', right: 'SW_MID', nextEnemy: 'P_BASE' },
-  L1: { id: 'L1', x: 10.0, y: 45.2, nextPlayer: 'L2', nextEnemy: 'SW_BOT' },
-  L2: { id: 'L2', x: 8.4, y: 38.5, nextPlayer: 'L3', nextEnemy: 'L1' },
-  L3: { id: 'L3', x: 9.0, y: 29.5, nextPlayer: 'TOWER_L', nextEnemy: 'L2' },
-  SW_MID: { id: 'SW_MID', x: 20.5, y: 43.0, switchId: 'switch-mid', left: 'M1', right: 'R1', nextEnemy: 'SW_BOT' },
-  M1: { id: 'M1', x: 16.5, y: 37.8, nextPlayer: 'TOWER_MID', nextEnemy: 'SW_MID' },
-  TOWER_MID: { id: 'TOWER_MID', x: 18.0, y: 31.5, nextPlayer: 'SW_UP', nextEnemy: 'M1' },
-  SW_UP: { id: 'SW_UP', x: 18.0, y: 27.5, switchId: 'switch-upper', left: 'TOWER_L', right: 'TOWER_R', nextEnemy: 'TOWER_MID' },
-  R1: { id: 'R1', x: 27.5, y: 42.5, nextPlayer: 'R2', nextEnemy: 'SW_MID' },
-  R2: { id: 'R2', x: 28.4, y: 35.0, nextPlayer: 'R3', nextEnemy: 'R1' },
-  R3: { id: 'R3', x: 27.0, y: 28.0, nextPlayer: 'TOWER_R', nextEnemy: 'R2' },
-  TOWER_L: { id: 'TOWER_L', x: 11.2, y: 21.5, nextPlayer: 'L_TOP', nextEnemy: 'L3' },
-  TOWER_R: { id: 'TOWER_R', x: 24.8, y: 21.5, nextPlayer: 'R_TOP', nextEnemy: 'R3' },
-  L_TOP: { id: 'L_TOP', x: 12.6, y: 14.5, nextPlayer: 'BOSS', nextEnemy: 'TOWER_L' },
-  R_TOP: { id: 'R_TOP', x: 23.4, y: 14.5, nextPlayer: 'BOSS', nextEnemy: 'TOWER_R' },
-  BOSS: { id: 'BOSS', x: 18.0, y: 9.5, nextPlayer: null, nextEnemy: 'L_TOP' },
+  P_BASE: { id: 'P_BASE', name: 'HomeBase', x: PLAYER_BASE_POS.x, z: PLAYER_BASE_POS.z, nextTop: roadByName.get('Middle Path 0')?.guid, nextBottom: null },
+  BOSS: { id: 'BOSS', name: 'Onyxia', x: ONYXIA_POS.x, z: ONYXIA_POS.z, nextTop: null, nextBottom: roadByName.get('East Path 12')?.guid },
 };
 
-export function dist2D(ax, ay, bx, by) {
-  return Math.hypot(ax - bx, ay - by);
+for (const r of missionData.roads) {
+  const gTop = r.goals.find((g) => !g.teamDirection || g.teamDirection === 'TowardsTop')?.road || '';
+  const gBot = r.goals.find((g) => g.teamDirection === 'TowardsBottom')?.road || BOTTOM_FALLBACKS[r.name] || '';
+
+  WAYPOINT_NODES[r.guid] = {
+    id: r.guid,
+    name: r.name,
+    x: r.x,
+    z: r.z,
+    nextTop: gTop || 'BOSS',
+    nextBottom: gBot || 'P_BASE',
+  };
 }
 
-export function isInsideLava(x, y, margin = 0) {
-  for (const obs of LAVA_OBSTACLES) {
-    const dx = (x - obs.cx) / (obs.rx + margin);
-    const dy = (y - obs.cy) / (obs.ry + margin);
-    if (dx * dx + dy * dy <= 1.0) return true;
+export const DEPLOY_AREA_DEFS = missionData.deployAreas.map((da) => ({
+  id: da.guid,
+  name: da.name,
+  unitGuid: da.unitGuid,
+  x: da.x,
+  z: da.z,
+  width: da.width,
+  depth: da.depth,
+  xMin: da.x - da.width * 0.5,
+  xMax: da.x + da.width * 0.5,
+  zMin: da.z - da.depth * 0.5,
+  zMax: da.z + da.depth * 0.5,
+  topRoad: da.goals.find((g) => !g.teamDirection || g.teamDirection === 'TowardsTop')?.road || null,
+  bottomRoad: da.goals.find((g) => g.teamDirection === 'TowardsBottom')?.road || null,
+}));
+
+export function dist2D(ax, az, bx, bz) {
+  return Math.hypot(ax - bx, az - bz);
+}
+
+export function isInsideUnwalkable(x, z, margin = 0) {
+  for (const obs of UNWALKABLE_OBSTACLES) {
+    const dx = (x - obs.cx) / Math.max(0.5, obs.rx + margin);
+    const dz = (z - obs.cz) / Math.max(0.5, obs.rz + margin);
+    if (dx * dx + dz * dz <= 1.0) return true;
   }
   return false;
 }
 
-export function clampToArena(x, y) {
+export function clampToArena(x, z) {
   return {
-    x: Math.max(3.0, Math.min(MAP_WIDTH - 3.0, x)),
-    y: Math.max(6.0, Math.min(MAP_HEIGHT - 5.5, y)),
+    x: Math.max(ARENA_BOUNDS.xMin, Math.min(ARENA_BOUNDS.xMax, x)),
+    z: Math.max(ARENA_BOUNDS.zMin, Math.min(ARENA_BOUNDS.zMax, z)),
   };
+}
+
+export function getSwitchTargetPoint(sw, team = 'player') {
+  if (!sw) return null;
+  if (sw.id === 'switch-tower-1') {
+    const targetGuid = sw.dir === 'right' ? sw.rightRoad : sw.leftRoad;
+    return roadByGuid.get(targetGuid) || { x: sw.x, z: sw.z + 5 };
+  }
+  if (sw.id === 'switch-east-lane') {
+    const targetGuid = sw.dir === 'left' ? sw.leftRoad : sw.rightRoad;
+    return roadByGuid.get(targetGuid) || { x: sw.x, z: sw.z - 5 };
+  }
+  if (sw.id === 'switch-tower-2') {
+    if (team === 'player') {
+      return sw.dir === 'left' ? roadByName.get('West Path 7') : roadByName.get('Middle Path 6');
+    }
+    return sw.dir === 'left' ? roadByGuid.get(sw.leftRoad) : roadByGuid.get(sw.rightRoad);
+  }
+  if (sw.id === 'switch-tower-3') {
+    return sw.dir === 'left' ? roadByGuid.get(sw.leftRoad) : roadByGuid.get(sw.rightRoad);
+  }
+  return null;
 }
 
 export function resolveNextNodeId(nodeId, team, switches) {
   const node = WAYPOINT_NODES[nodeId];
   if (!node) return null;
+
   if (team === 'player') {
-    if (node.switchId) {
-      const dir = switches?.[node.switchId]?.dir || 'left';
-      return dir === 'right' ? node.right : node.left;
+    if (node.name === 'Middle Path 3' && switches?.['switch-tower-1']) {
+      const sw = switches['switch-tower-1'];
+      return sw.dir === 'right' ? sw.rightRoad : sw.leftRoad;
     }
-    return node.nextPlayer;
+    if (node.name === 'Middle Path 5' && switches?.['switch-tower-2']) {
+      const sw = switches['switch-tower-2'];
+      if (sw.dir === 'left') return roadByName.get('West Path 7')?.guid || node.nextTop;
+      return roadByName.get('Middle Path 6')?.guid || node.nextTop;
+    }
+    return node.nextTop;
   }
-  return node.nextEnemy;
+
+  // Enemy (TowardsBottom)
+  if (node.name === 'East Path 6' && switches?.['switch-east-lane']) {
+    const sw = switches['switch-east-lane'];
+    return sw.dir === 'left' ? sw.leftRoad : sw.rightRoad;
+  }
+  if (node.name === 'East Path 10' && switches?.['switch-tower-3']) {
+    const sw = switches['switch-tower-3'];
+    return sw.dir === 'left' ? sw.leftRoad : sw.rightRoad;
+  }
+  if (node.name === 'West Path 7' && switches?.['switch-tower-2']) {
+    const sw = switches['switch-tower-2'];
+    if (sw.dir === 'right') return sw.rightRoad;
+  }
+  return node.nextBottom;
 }
 
-export function pickInitialNodeId(x, y, team) {
-  let bestId = team === 'player' ? 'SW_BOT' : 'BOSS';
+export function pickInitialNodeId(x, z, team) {
+  // Check official deploy areas first for exact lane assignment
+  for (const da of DEPLOY_AREA_DEFS) {
+    if (x >= da.xMin && x <= da.xMax && z >= da.zMin && z <= da.zMax) {
+      const candidate = team === 'player' ? da.topRoad : da.bottomRoad;
+      if (candidate && WAYPOINT_NODES[candidate]) return candidate;
+    }
+  }
+
+  let bestId = team === 'player' ? roadByName.get('Middle Path 0')?.guid || 'BOSS' : 'P_BASE';
   let bestScore = Infinity;
   for (const node of Object.values(WAYPOINT_NODES)) {
-    if (team === 'player' && node.id === 'BOSS') continue;
-    if (team === 'enemy' && node.id === 'P_BASE') continue;
-    const d = dist2D(x, y, node.x, node.y);
-    // Slight directional bias so units prefer nodes ahead of them
-    const forwardBonus = team === 'player' ? (node.y < y ? -1.8 : 2.5) : (node.y > y ? -1.8 : 2.5);
-    const score = d + forwardBonus;
+    if (team === 'player' && node.id === 'P_BASE') continue;
+    if (team === 'enemy' && node.id === 'BOSS') continue;
+    const d = dist2D(x, z, node.x, node.z);
+    // Forward preference: player advances +z, enemy advances -z
+    const forwardBias = team === 'player' ? (node.z >= z - 1.5 ? -2.4 : 4.0) : (node.z <= z + 1.5 ? -2.4 : 4.0);
+    const score = d + forwardBias;
     if (score < bestScore) {
       bestScore = score;
       bestId = node.id;
@@ -184,19 +346,24 @@ export function pickInitialNodeId(x, y, team) {
 }
 
 export function getPlayerDeployZones(state) {
-  const zones = [
-    { kind: 'rect', xMin: 4.5, xMax: 31.5, yMin: 47.0, yMax: 58.0 },
-  ];
-  for (const s of state.structures || []) {
-    if (s.team === 'player' && s.hp > 0 && !s.rebuilding) {
-      zones.push({ kind: 'circle', x: s.x, y: s.y, r: s.deployRadius || 5.8 });
-    }
-  }
-  return zones;
+  const friendlyGuids = new Set(
+    (state.structures || [])
+      .filter((s) => s.team === 'player' && s.hp > 0 && !s.rebuilding)
+      .map((s) => s.guid)
+  );
+  return DEPLOY_AREA_DEFS.filter((da) => !da.name.startsWith('Boss') && friendlyGuids.has(da.unitGuid));
 }
 
-export function isValidDeployPosition(x, y, spec, state) {
-  if (x < 2.8 || x > MAP_WIDTH - 2.8 || y < 5.5 || y > MAP_HEIGHT - 5.2) {
+export function getBossDeployAreas() {
+  return DEPLOY_AREA_DEFS.filter((da) => da.name.startsWith('Boss'));
+}
+
+export function getStructureDeployAreas(structureGuid) {
+  return DEPLOY_AREA_DEFS.filter((da) => da.unitGuid === structureGuid);
+}
+
+export function isValidDeployPosition(x, z, spec, state) {
+  if (x < ARENA_BOUNDS.xMin || x > ARENA_BOUNDS.xMax || z < ARENA_BOUNDS.zMin || z > ARENA_BOUNDS.zMax) {
     return { valid: false, reason: '超出战场边界' };
   }
 
@@ -204,21 +371,19 @@ export function isValidDeployPosition(x, y, spec, state) {
     return { valid: true };
   }
 
-  // Ground non-flying troops cannot be dropped directly inside lava pits
-  if (!spec?.isFlying && isInsideLava(x, y, 0.1)) {
-    return { valid: false, reason: '不可部署在熔岩障碍上' };
+  if (!spec?.isFlying && isInsideUnwalkable(x, z, 0.25)) {
+    return { valid: false, reason: '不可部署在熔岩/岩壁障碍上' };
   }
 
-  // Cannot drop units directly on top of Onyxia boss core
-  if (dist2D(x, y, ONYXIA_POS.x, ONYXIA_POS.y) < 3.4) {
-    return { valid: false, reason: '不可直接重叠部署在奥妮克希亚本体上' };
+  if (dist2D(x, z, ONYXIA_POS.x, ONYXIA_POS.z) < ONYXIA_POS.radius + 0.5) {
+    return { valid: false, reason: '不可直接部署在奥妮克希亚本体内' };
   }
 
   if (spec?.slug === 'ragnaros') {
-    const nearFriendlyStructure = (state.structures || []).some(
-      (s) => s.team === 'player' && s.hp > 0 && !s.rebuilding && dist2D(x, y, s.x, s.y) <= (s.deployRadius || 5.8)
+    const nearFriendly = (state.structures || []).some(
+      (s) => s.team === 'player' && s.hp > 0 && !s.rebuilding && dist2D(x, z, s.x, s.z) <= (s.radius || 2.5) + 4.5
     );
-    return nearFriendlyStructure
+    return nearFriendly
       ? { valid: true }
       : { valid: false, reason: '拉格纳罗斯必须部署在己方基地或防御塔上' };
   }
@@ -228,17 +393,17 @@ export function isValidDeployPosition(x, y, spec, state) {
   }
 
   const zones = getPlayerDeployZones(state);
-  for (const z of zones) {
-    if (z.kind === 'rect') {
-      if (x >= z.xMin && x <= z.xMax && y >= z.yMin && y <= z.yMax) {
-        return { valid: true };
-      }
-    } else if (z.kind === 'circle') {
-      if (dist2D(x, y, z.x, z.y) <= z.r) {
-        return { valid: true };
-      }
+  for (const da of zones) {
+    if (x >= da.xMin && x <= da.xMax && z >= da.zMin && z <= da.zMax) {
+      return { valid: true };
     }
   }
 
-  return { valid: false, reason: '请部署在己方底线或已占领防御塔附近（空投/法术可全图部署）' };
+  return { valid: false, reason: '请部署在蓝色部署网格（基地或已占领哨塔区域）内' };
 }
+
+export const ONYXIA_TAUNTS = missionData.onyxiaTaunts || [
+  '真走运……我的下一餐自己送上门来了。',
+  '你会付出代价的！',
+  '要明白你的处境！',
+];

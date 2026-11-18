@@ -3,7 +3,7 @@ import { decodeRumblo, encodeRumblo } from '../services/rumblo.js';
 import { loadSaveData, recordBattleOutcome, writeSaveData } from '../services/storage.js';
 import { MINI_BY_SLUG } from '../engine/unit-stats.js';
 import { sfx } from '../audio/sfx.js';
-import { renderLobbyView } from './lobby-view.js';
+import { destroyLobbyTurntable, renderLobbyView } from './lobby-view.js';
 import { BattleController } from './battle-hud.js';
 
 export function startApp() {
@@ -146,6 +146,7 @@ export function startApp() {
           render();
         },
         onStartBattle: () => {
+          destroyLobbyTurntable();
           appState.mode = 'battle';
           appState.picker.slot = null;
           const difficulty = getDifficultyById(appState.save.difficultyId);

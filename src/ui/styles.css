@@ -600,48 +600,220 @@ button {
   transform: translateX(-50%) translateY(0);
 }
 
-/* ==================== BATTLE SCREEN ==================== */
-.wr-battle-shell {
-  height: 100dvh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+/* ==================== LOBBY 3D TURNTABLE ==================== */
+.wr-turntable-card {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: radial-gradient(circle at 25% 50%, rgba(56, 40, 26, 0.72), rgba(17, 16, 24, 0.92));
+  border: 1px solid rgba(229, 184, 75, 0.35);
   align-items: center;
-  justify-content: space-between;
-  background: radial-gradient(circle at 50% 25%, #2a181b 0%, #121118 75%);
-  overflow: hidden;
-  padding: 6px 8px;
-  gap: 6px;
 }
 
-.wr-battle-topbar {
-  width: min(560px, 100%);
+@media (max-width: 640px) {
+  .wr-turntable-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wr-turntable-canvas-box {
+  position: relative;
+  width: 100%;
+  height: 196px;
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 45%, #2f2336 0%, #110e17 85%);
+  border: 1px solid #594b3b;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.wr-turntable-canvas-box:active {
+  cursor: grabbing;
+}
+
+.wr-turntable-canvas-box canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.wr-turntable-drag-tip {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #cbb58c;
+  background: rgba(15, 13, 20, 0.75);
+  padding: 2px 8px;
+  border-radius: 999px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.wr-turntable-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex-shrink: 0;
 }
 
-.wr-boss-bar-row {
+.wr-launch-3d-btn {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+/* ==================== V2 3D BATTLE SCREEN ==================== */
+.wr-battle-shell.wr-3d-mode {
+  height: 100dvh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #0d080a;
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(20, 17, 24, 0.9);
-  border: 1px solid #7c2d12;
-  border-radius: 8px;
-  padding: 4px 8px;
+  justify-content: center;
+}
+
+.wr-battle-shell.wr-3d-mode .wr-canvas-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.wr-battle-canvas-3d {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+}
+
+.wr-battle-canvas-3d:active {
+  cursor: grabbing;
+}
+
+.wr-world-overlays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.wr-world-hp {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 9px;
+  background: url('/r/hud/UnitHealthMeter_BGFramed.webp') center/100% 100% no-repeat;
+  padding: 2px 3px;
+  will-change: transform;
+}
+
+.wr-world-hp.struct {
+  width: 68px;
+  height: 12px;
+  background-image: url('/r/hud/UnitHealthMeter_BaseBG.webp');
+  padding: 2px 4px;
+}
+
+.wr-world-hp .bar {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(15, 12, 18, 0.8);
+}
+
+.wr-world-hp .fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
+  transition: width 0.08s linear;
+}
+
+.wr-world-hp.enemy .fill {
+  background: linear-gradient(90deg, #ef4444, #b91c1c);
+}
+
+.wr-world-hp.neutral .fill {
+  background: linear-gradient(90deg, #facc15, #ca8a04);
+}
+
+.wr-float-dmg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-numbers);
+  font-size: 14px;
+  font-weight: 800;
+  text-shadow: 0 2px 3px #000, 1px 0 2px #000, -1px 0 2px #000;
+  white-space: nowrap;
+  will-change: transform, opacity;
+}
+
+/* Top Floating CombatHUD */
+.wr-hud-top {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(620px, calc(100% - 16px));
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.wr-hud-top > * {
+  pointer-events: auto;
+}
+
+.wr-boss-plate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(35, 22, 26, 0.92), rgba(18, 12, 16, 0.92));
+  border: 2px solid #8a4a2a;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.72);
+}
+
+.wr-boss-portrait-wrap {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .wr-boss-mood {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   border: 2px solid #dc2626;
   object-fit: cover;
-  flex-shrink: 0;
+  display: block;
 }
 
-.wr-boss-hp-wrap {
+.wr-boss-phase-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #991b1b;
+  border: 1px solid #fcd34d;
+  color: #fef08a;
+  font-family: var(--font-numbers);
+  font-size: 11px;
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+.wr-boss-hp-col {
   flex: 1;
   min-width: 0;
 }
@@ -650,88 +822,148 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
-  margin-bottom: 3px;
   gap: 6px;
+  font-size: 12px;
+  color: #fde68a;
+  margin-bottom: 4px;
 }
 
-.wr-boss-hp-track {
+.wr-boss-traits-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.wr-boss-traits-inline img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.wr-boss-hp-track-hud {
   position: relative;
-  height: 14px;
+  height: 16px;
+  padding: 2px 5px;
+  background: url('/r/hud/UnitHealthMeter_BossBG.webp') center/100% 100% no-repeat;
   border-radius: 999px;
-  background: #271518;
-  border: 1px solid #6b2b2b;
   overflow: hidden;
 }
 
 .wr-boss-hp-fill {
   height: 100%;
-  background: linear-gradient(90deg, #dc2626, #f97316);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b91c1c, #ef4444 55%, #f97316);
   transition: width 0.12s linear;
 }
 
 .wr-boss-notch {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 2px;
+  bottom: 2px;
   width: 2px;
-  background: rgba(255, 240, 170, 0.85);
+  background: rgba(254, 240, 138, 0.85);
 }
 
-.wr-battle-ctrl-row {
+.wr-timer-frame {
+  width: 96px;
+  height: 44px;
+  flex-shrink: 0;
+  background: url('/r/hud/CombatHUD_Tex_TimerFrame.webp') center/100% 100% no-repeat;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  font-size: 12px;
+  justify-content: center;
+  line-height: 1.05;
 }
 
-.wr-timer-pill {
+.wr-timer-val {
   font-family: var(--font-numbers);
   font-size: 15px;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: #1b1a24;
-  border: 1px solid #6b5b47;
   color: #fef08a;
+  text-shadow: 0 2px #000;
 }
 
-.wr-timer-pill.overtime {
-  background: #7f1d1d;
-  border-color: #ef4444;
-  color: #fff;
+.wr-timer-val.overtime {
+  color: #f87171;
 }
 
-.wr-canvas-stage {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
+.wr-egg-sub {
+  font-size: 9px;
+  color: #e5d5b5;
+}
+
+.wr-ctrl-strip {
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.wr-hud-chip {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: rgba(24, 22, 32, 0.9);
+  border: 1px solid #756248;
+  color: #ffe7ad;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.wr-hud-chip.active {
+  background: #14532d;
+  border-color: #4ade80;
+  color: #dcfce7;
+}
+
+.wr-hud-chip.danger {
+  background: rgba(127, 29, 29, 0.85);
+  border-color: #ef4444;
+  color: #fee2e2;
+}
+
+.wr-hud-icon-btn {
+  width: 30px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(24, 22, 32, 0.9);
+  border: 1px solid #756248;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.wr-battle-canvas {
-  height: 100%;
-  max-height: 100%;
-  aspect-ratio: 9 / 16;
-  max-width: min(100%, 520px);
-  border-radius: 10px;
-  border: 2px solid #6e4736;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.72);
-  background: #1b1416;
-  touch-action: none;
-  cursor: crosshair;
+.wr-hud-icon-btn img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.wr-boss-taunt {
+  position: absolute;
+  top: 106px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(440px, 84%);
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: rgba(30, 12, 14, 0.92);
+  border: 1px solid #dc2626;
+  color: #fecaca;
+  font-size: 12px;
+  font-style: italic;
+  z-index: 16;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
 }
 
 .wr-battle-banner {
   position: absolute;
-  top: 10px;
+  top: 140px;
   left: 50%;
   transform: translateX(-50%);
-  max-width: 90%;
-  padding: 5px 12px;
+  max-width: min(520px, 88%);
+  padding: 5px 14px;
   border-radius: 999px;
   background: rgba(23, 14, 18, 0.9);
   border: 1px solid #f59e0b;
@@ -740,74 +972,139 @@ button {
   font-weight: 600;
   text-align: center;
   pointer-events: none;
+  z-index: 16;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
-.wr-battle-tray {
-  width: min(560px, 100%);
+/* Right Tactical Minimap & Offscreen Keep Warning */
+.wr-minimap-wrap {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  flex-shrink: 0;
-  background: rgba(20, 19, 28, 0.94);
-  border: 1px solid #635340;
-  border-radius: 10px;
-  padding: 6px 8px;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 8px;
+  background: rgba(16, 13, 20, 0.85);
+  border: 1px solid #756248;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65);
 }
 
-.wr-gold-row {
+.wr-minimap-wrap canvas {
+  display: block;
+  border-radius: 4px;
+  cursor: ns-resize;
+}
+
+.wr-minimap-hint {
+  font-size: 10px;
+  color: #cbb58c;
+}
+
+.wr-offscreen-warn {
+  position: absolute;
+  bottom: 138px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 16;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(127, 29, 29, 0.92);
+  border: 1px solid #f87171;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+}
+
+.wr-offscreen-warn img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* Bottom Authentic Card Tray Overlay */
+.wr-hud-bottom {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, calc(100% - 16px));
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(31, 26, 36, 0.92), rgba(16, 14, 21, 0.96));
+  border: 2px solid #756248;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.78);
+}
+
+.wr-gold-hud {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.wr-gold-num {
+.wr-gold-nugget-badge {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-family: var(--font-numbers);
-  font-size: 17px;
-  color: #fde047;
   min-width: 44px;
+  font-family: var(--font-numbers);
+  font-size: 18px;
+  color: #fde047;
+  text-shadow: 0 2px #000;
 }
 
-.wr-gold-num img {
-  width: 20px;
+.wr-gold-nugget-badge img {
+  width: 24px;
   height: 20px;
+  object-fit: contain;
 }
 
-.wr-gold-bars {
+.wr-gold-nugget-track {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   gap: 3px;
-  height: 12px;
+  height: 15px;
+  padding: 2px 4px;
+  background: url('/r/hud/CombatHUD_Tex_GoldMeter_FrontFace.webp') center/100% 100% no-repeat;
 }
 
 .wr-gold-seg {
-  background: #23212c;
-  border: 1px solid #4c4654;
-  border-radius: 3px;
+  background: rgba(15, 13, 19, 0.85);
+  border-radius: 2px;
   overflow: hidden;
 }
 
 .wr-gold-seg-fill {
   height: 100%;
-  background: linear-gradient(180deg, #fde047, #d97706);
+  background: linear-gradient(180deg, #fef08a, #f59e0b 60%, #b45309);
 }
 
-.wr-hand-row {
+.wr-hand-row-3d {
   display: grid;
   grid-template-columns: repeat(4, 1fr) 68px;
   gap: 6px;
   align-items: stretch;
 }
 
-.wr-hand-card {
+.wr-hand-card-3d {
   position: relative;
   border-radius: 8px;
-  border: 2px solid #675743;
-  background: linear-gradient(180deg, #2d2b3c, #1a1924);
+  background: url('/r/hud/CombatHUD_Tex_Statue_Base_HUD_Pose.webp') center bottom/100% 52% no-repeat,
+    linear-gradient(180deg, rgba(46, 42, 62, 0.92), rgba(22, 20, 30, 0.96));
+  border: 2px solid #756248;
   padding: 5px 4px;
   display: flex;
   flex-direction: column;
@@ -815,63 +1112,85 @@ button {
   justify-content: center;
   gap: 2px;
   user-select: none;
-  transition: transform 0.1s ease, border-color 0.1s ease;
+  transition: transform 0.1s ease, border-color 0.1s ease, filter 0.1s ease;
 }
 
-.wr-hand-card.selected {
+.wr-hand-card-3d.selected {
   border-color: #38bdf8;
-  transform: translateY(-4px);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.55);
+  transform: translateY(-6px);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.65);
 }
 
-.wr-hand-card.unaffordable {
-  opacity: 0.48;
-  filter: grayscale(0.35);
+.wr-hand-card-3d.unaffordable {
+  opacity: 0.45;
+  filter: grayscale(0.45);
 }
 
-.wr-hand-card img {
-  width: 44px;
-  height: 44px;
+.wr-hud-cost {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 20px;
+  background: url('/r/hud/CombatHUD_Tex_Statue_Base_HUD_CostFrame.webp') center/contain no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-numbers);
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 0 1px 2px #000;
+}
+
+.wr-hud-mini-spr {
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   pointer-events: none;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.85));
 }
 
-.wr-hand-card .nm {
+.wr-hand-card-3d .nm {
   font-size: 11px;
   font-weight: 600;
-  color: #f4eee2;
+  color: #fff6e6;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  text-shadow: 0 1px 2px #000;
 }
 
-.wr-hand-card .key-hint {
+.wr-hand-card-3d .key-hint {
   position: absolute;
-  bottom: 2px;
-  right: 4px;
+  top: 3px;
+  right: 3px;
+  width: 16px;
+  height: 18px;
+  background: url('/r/hud/CombatHUD_Tex_HotkeyIndicator.webp') center/contain no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 9px;
-  color: #a19a90;
+  color: #e5d5b5;
 }
 
-.wr-next-card {
-  border-radius: 8px;
-  border: 1px dashed #6b5b47;
-  background: #171620;
+.wr-next-card-3d {
+  background: url('/r/hud/CombatHUD_Tex_Tray_NextPanel.webp') center/100% 100% no-repeat;
   padding: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  color: #b5ada3;
+  color: #cbb58c;
 }
 
-.wr-next-card img {
-  width: 32px;
-  height: 32px;
+.wr-next-card-3d img {
+  width: 34px;
+  height: 34px;
   object-fit: contain;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .wr-dmg-row {

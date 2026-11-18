@@ -1,0 +1,854 @@
+{
+  "env": {
+    "onyxiaLair": "./r/3d/env/onyxia-lair.glb"
+  },
+  "poi": {
+    "onyxia-boss": {
+      "glb": "./r/3d/poi/onyxia-boss.glb",
+      "bytes": 744340,
+      "bbox": {
+        "min": [
+          -11.962,
+          0.0,
+          -10.991
+        ],
+        "max": [
+          11.962,
+          9.881,
+          10.991
+        ],
+        "size": [
+          23.924,
+          9.881,
+          21.981
+        ]
+      }
+    },
+    "player-keep": {
+      "glb": "./r/3d/poi/player-keep.glb",
+      "bytes": 304904,
+      "bbox": {
+        "min": [
+          -4.497,
+          -2.492,
+          -3.868
+        ],
+        "max": [
+          4.497,
+          4.844,
+          3.868
+        ],
+        "size": [
+          8.994,
+          7.335,
+          7.736
+        ]
+      }
+    },
+    "tower-player": {
+      "glb": "./r/3d/poi/tower-player.glb",
+      "bytes": 498900,
+      "bbox": {
+        "min": [
+          -2.161,
+          0.191,
+          -2.539
+        ],
+        "max": [
+          2.161,
+          4.385,
+          2.315
+        ],
+        "size": [
+          4.321,
+          4.194,
+          4.854
+        ]
+      }
+    },
+    "tower-enemy": {
+      "glb": "./r/3d/poi/tower-enemy.glb",
+      "bytes": 657932,
+      "bbox": {
+        "min": [
+          -2.261,
+          -0.051,
+          -2.711
+        ],
+        "max": [
+          2.373,
+          4.77,
+          2.371
+        ],
+        "size": [
+          4.634,
+          4.821,
+          5.083
+        ]
+      }
+    },
+    "gold-mine": {
+      "glb": "./r/3d/poi/gold-mine.glb",
+      "bytes": 27160,
+      "bbox": {
+        "min": [
+          -1.71,
+          0.0,
+          -1.929
+        ],
+        "max": [
+          1.71,
+          2.686,
+          1.929
+        ],
+        "size": [
+          3.421,
+          2.686,
+          3.858
+        ]
+      }
+    },
+    "treasure-chest": {
+      "glb": "./r/3d/poi/treasure-chest.glb",
+      "bytes": 74248,
+      "bbox": {
+        "min": [
+          -1.376,
+          0.0,
+          -1.349
+        ],
+        "max": [
+          1.376,
+          2.358,
+          1.349
+        ],
+        "size": [
+          2.751,
+          2.358,
+          2.699
+        ]
+      }
+    },
+    "lane-switch": {
+      "glb": "./r/3d/poi/lane-switch.glb",
+      "bytes": 35668,
+      "bbox": {
+        "min": [
+          -1.666,
+          0.0,
+          -1.68
+        ],
+        "max": [
+          1.666,
+          0.507,
+          1.68
+        ],
+        "size": [
+          3.331,
+          0.507,
+          3.36
+        ]
+      }
+    },
+    "lane-switch-arrow": {
+      "glb": "./r/3d/poi/lane-switch-arrow.glb",
+      "bytes": 22236,
+      "bbox": {
+        "min": [
+          -0.879,
+          0.0,
+          -0.862
+        ],
+        "max": [
+          1.231,
+          0.187,
+          0.914
+        ],
+        "size": [
+          2.11,
+          0.187,
+          1.776
+        ]
+      }
+    },
+    "onyxia-warder": {
+      "glb": "./r/3d/poi/onyxia-warder.glb",
+      "bytes": 179500,
+      "bbox": {
+        "min": [
+          -1.759,
+          0.0,
+          -2.168
+        ],
+        "max": [
+          1.759,
+          3.721,
+          2.168
+        ],
+        "size": [
+          3.517,
+          3.721,
+          4.335
+        ]
+      }
+    },
+    "kobold-miner": {
+      "glb": "./r/3d/poi/kobold-miner.glb",
+      "bytes": 244456,
+      "bbox": {
+        "min": [
+          -1.221,
+          0.0,
+          -1.671
+        ],
+        "max": [
+          1.221,
+          3.38,
+          1.671
+        ],
+        "size": [
+          2.442,
+          3.38,
+          3.341
+        ]
+      }
+    },
+    "onyxia-egg": {
+      "glb": "./r/3d/poi/onyxia-egg.glb",
+      "bytes": 116332,
+      "bbox": {
+        "min": [
+          -0.607,
+          0.0,
+          -0.747
+        ],
+        "max": [
+          0.607,
+          1.588,
+          0.747
+        ],
+        "size": [
+          1.213,
+          1.588,
+          1.494
+        ]
+      }
+    },
+    "onyxia-whelp": {
+      "glb": "./r/3d/poi/onyxia-whelp.glb",
+      "bytes": 255408,
+      "bbox": {
+        "min": [
+          -0.483,
+          0.0,
+          -0.557
+        ],
+        "max": [
+          0.483,
+          1.266,
+          0.557
+        ],
+        "size": [
+          0.966,
+          1.266,
+          1.115
+        ]
+      }
+    },
+    "spirit-wolf": {
+      "glb": "./r/3d/poi/spirit-wolf.glb",
+      "bytes": 155484,
+      "bbox": {
+        "min": [
+          -0.534,
+          0.0,
+          -1.716
+        ],
+        "max": [
+          0.534,
+          1.683,
+          1.716
+        ],
+        "size": [
+          1.068,
+          1.683,
+          3.432
+        ]
+      }
+    },
+    "skeleton-minion": {
+      "glb": "./r/3d/poi/skeleton-minion.glb",
+      "bytes": 228400,
+      "bbox": {
+        "min": [
+          -0.678,
+          0.0,
+          -0.806
+        ],
+        "max": [
+          0.678,
+          1.989,
+          0.806
+        ],
+        "size": [
+          1.356,
+          1.989,
+          1.612
+        ]
+      }
+    }
+  },
+  "pedestals": {
+    "alliance": "./r/3d/pedestals/alliance.glb",
+    "horde": "./r/3d/pedestals/horde.glb",
+    "undead": "./r/3d/pedestals/undead.glb",
+    "beast": "./r/3d/pedestals/beast.glb",
+    "blackrock": "./r/3d/pedestals/blackrock.glb",
+    "cenarion": "./r/3d/pedestals/cenarion.glb",
+    "neutral": "./r/3d/pedestals/neutral.glb"
+  },
+  "minis": {
+    "abomination": {
+      "glb": "./r/3d/minis/abomination.glb",
+      "pedestal": "undead",
+      "height": 4.64,
+      "bytes": 256440
+    },
+    "ancient-of-war": {
+      "glb": "./r/3d/minis/ancient-of-war.glb",
+      "pedestal": "cenarion",
+      "height": 7.46,
+      "bytes": 318524
+    },
+    "angry-chickens": {
+      "glb": "./r/3d/minis/angry-chickens.glb",
+      "pedestal": "beast",
+      "height": 1.01,
+      "bytes": 339952
+    },
+    "anub-arak": {
+      "glb": "./r/3d/minis/anub-arak.glb",
+      "pedestal": "beast",
+      "height": 5.21,
+      "bytes": 378908
+    },
+    "arthas": {
+      "glb": "./r/3d/minis/arthas.glb",
+      "pedestal": "alliance",
+      "height": 4.64,
+      "bytes": 334208
+    },
+    "banshee": {
+      "glb": "./r/3d/minis/banshee.glb",
+      "pedestal": "undead",
+      "height": 3.34,
+      "bytes": 435680
+    },
+    "baron-rivendare": {
+      "glb": "./r/3d/minis/baron-rivendare.glb",
+      "pedestal": "undead",
+      "height": 7.69,
+      "bytes": 629052
+    },
+    "bat-rider": {
+      "glb": "./r/3d/minis/bat-rider.glb",
+      "pedestal": "horde",
+      "height": 4.56,
+      "bytes": 298968
+    },
+    "bloodmage-thalnos": {
+      "glb": "./r/3d/minis/bloodmage-thalnos.glb",
+      "pedestal": "undead",
+      "height": 6.56,
+      "bytes": 1304516
+    },
+    "bog-beast": {
+      "glb": "./r/3d/minis/bog-beast.glb",
+      "pedestal": "cenarion",
+      "height": 3.64,
+      "bytes": 295380
+    },
+    "cairne-bloodhoof": {
+      "glb": "./r/3d/minis/cairne-bloodhoof.glb",
+      "pedestal": "horde",
+      "height": 5.96,
+      "bytes": 275208
+    },
+    "cenarius": {
+      "glb": "./r/3d/minis/cenarius.glb",
+      "pedestal": "cenarion",
+      "height": 5.86,
+      "bytes": 343140
+    },
+    "charlga-razorflank": {
+      "glb": "./r/3d/minis/charlga-razorflank.glb",
+      "pedestal": "beast",
+      "height": 3.23,
+      "bytes": 234968
+    },
+    "chimaera": {
+      "glb": "./r/3d/minis/chimaera.glb",
+      "pedestal": "beast",
+      "height": 3.41,
+      "bytes": 491068
+    },
+    "core-hounds": {
+      "glb": "./r/3d/minis/core-hounds.glb",
+      "pedestal": "blackrock",
+      "height": 6.08,
+      "bytes": 590168
+    },
+    "dark-iron-miner": {
+      "glb": "./r/3d/minis/dark-iron-miner.glb",
+      "pedestal": "blackrock",
+      "height": 6.94,
+      "bytes": 265452
+    },
+    "darkspear-troll": {
+      "glb": "./r/3d/minis/darkspear-troll.glb",
+      "pedestal": "horde",
+      "height": 4.8,
+      "bytes": 207692
+    },
+    "defias-bandits": {
+      "glb": "./r/3d/minis/defias-bandits.glb",
+      "pedestal": "alliance",
+      "height": 2.58,
+      "bytes": 281916
+    },
+    "dire-batlings": {
+      "glb": "./r/3d/minis/dire-batlings.glb",
+      "pedestal": "undead",
+      "height": 0.32,
+      "bytes": 62956
+    },
+    "drake": {
+      "glb": "./r/3d/minis/drake.glb",
+      "pedestal": "blackrock",
+      "height": 5.3,
+      "bytes": 651884
+    },
+    "druid-of-the-claw": {
+      "glb": "./r/3d/minis/druid-of-the-claw.glb",
+      "pedestal": "cenarion",
+      "height": 4.32,
+      "bytes": 1047176
+    },
+    "dryad": {
+      "glb": "./r/3d/minis/dryad.glb",
+      "pedestal": "cenarion",
+      "height": 5.83,
+      "bytes": 300444
+    },
+    "earth-elemental": {
+      "glb": "./r/3d/minis/earth-elemental.glb",
+      "pedestal": "blackrock",
+      "height": 3.12,
+      "bytes": 159968
+    },
+    "emperor-thaurissan": {
+      "glb": "./r/3d/minis/emperor-thaurissan.glb",
+      "pedestal": "blackrock",
+      "height": 3.35,
+      "bytes": 291088
+    },
+    "faerie-dragon": {
+      "glb": "./r/3d/minis/faerie-dragon.glb",
+      "pedestal": "cenarion",
+      "height": 2.7,
+      "bytes": 236808
+    },
+    "fire-elemental": {
+      "glb": "./r/3d/minis/fire-elemental.glb",
+      "pedestal": "blackrock",
+      "height": 4.64,
+      "bytes": 457360
+    },
+    "firehammer": {
+      "glb": "./r/3d/minis/firehammer.glb",
+      "pedestal": "blackrock",
+      "height": 3.1,
+      "bytes": 256536
+    },
+    "flamewaker": {
+      "glb": "./r/3d/minis/flamewaker.glb",
+      "pedestal": "blackrock",
+      "height": 5.03,
+      "bytes": 190244
+    },
+    "footmen": {
+      "glb": "./r/3d/minis/footmen.glb",
+      "pedestal": "alliance",
+      "height": 3.14,
+      "bytes": 189240
+    },
+    "frostwolf-shaman": {
+      "glb": "./r/3d/minis/frostwolf-shaman.glb",
+      "pedestal": "horde",
+      "height": 3.24,
+      "bytes": 239688
+    },
+    "gargoyle": {
+      "glb": "./r/3d/minis/gargoyle.glb",
+      "pedestal": "undead",
+      "height": 3.38,
+      "bytes": 238344
+    },
+    "general-drakkisath": {
+      "glb": "./r/3d/minis/general-drakkisath.glb",
+      "pedestal": "blackrock",
+      "height": 8.16,
+      "bytes": 349560
+    },
+    "ghoul": {
+      "glb": "./r/3d/minis/ghoul.glb",
+      "pedestal": "undead",
+      "height": 2.76,
+      "bytes": 263036
+    },
+    "gnoll-brute": {
+      "glb": "./r/3d/minis/gnoll-brute.glb",
+      "pedestal": "beast",
+      "height": 3.94,
+      "bytes": 240212
+    },
+    "goblin-sapper": {
+      "glb": "./r/3d/minis/goblin-sapper.glb",
+      "pedestal": "horde",
+      "height": 4.87,
+      "bytes": 307760
+    },
+    "grommash-hellscream": {
+      "glb": "./r/3d/minis/grommash-hellscream.glb",
+      "pedestal": "horde",
+      "height": 4.33,
+      "bytes": 375240
+    },
+    "gryphon-rider": {
+      "glb": "./r/3d/minis/gryphon-rider.glb",
+      "pedestal": "alliance",
+      "height": 114.36,
+      "bytes": 400736
+    },
+    "harpies": {
+      "glb": "./r/3d/minis/harpies.glb",
+      "pedestal": "beast",
+      "height": 3.16,
+      "bytes": 246208
+    },
+    "harvest-golem": {
+      "glb": "./r/3d/minis/harvest-golem.glb",
+      "pedestal": "alliance",
+      "height": 3.84,
+      "bytes": 205816
+    },
+    "headless-horseman": {
+      "glb": "./r/3d/minis/headless-horseman.glb",
+      "pedestal": "undead",
+      "height": 7.21,
+      "bytes": 424320
+    },
+    "hogger": {
+      "glb": "./r/3d/minis/hogger.glb",
+      "pedestal": "beast",
+      "height": 4.42,
+      "bytes": 551112
+    },
+    "huntress": {
+      "glb": "./r/3d/minis/huntress.glb",
+      "pedestal": "alliance",
+      "height": 3.5,
+      "bytes": 349272
+    },
+    "jaina-proudmoore": {
+      "glb": "./r/3d/minis/jaina-proudmoore.glb",
+      "pedestal": "alliance",
+      "height": 3.81,
+      "bytes": 328920
+    },
+    "maiev-shadowsong": {
+      "glb": "./r/3d/minis/maiev-shadowsong.glb",
+      "pedestal": "alliance",
+      "height": 5.37,
+      "bytes": 332412
+    },
+    "malfurion": {
+      "glb": "./r/3d/minis/malfurion.glb",
+      "pedestal": "alliance",
+      "height": 4.39,
+      "bytes": 350668
+    },
+    "meat-wagon": {
+      "glb": "./r/3d/minis/meat-wagon.glb",
+      "pedestal": "undead",
+      "height": 5.21,
+      "bytes": 432320
+    },
+    "molten-giant": {
+      "glb": "./r/3d/minis/molten-giant.glb",
+      "pedestal": "blackrock",
+      "height": 4.4,
+      "bytes": 175612
+    },
+    "moonkin": {
+      "glb": "./r/3d/minis/moonkin.glb",
+      "pedestal": "cenarion",
+      "height": 5.17,
+      "bytes": 281676
+    },
+    "mountaineer": {
+      "glb": "./r/3d/minis/mountaineer.glb",
+      "pedestal": "alliance",
+      "height": 3.7,
+      "bytes": 365204
+    },
+    "murloc-tidehunters": {
+      "glb": "./r/3d/minis/murloc-tidehunters.glb",
+      "pedestal": "beast",
+      "height": 2.86,
+      "bytes": 170416
+    },
+    "necromancer": {
+      "glb": "./r/3d/minis/necromancer.glb",
+      "pedestal": "undead",
+      "height": 3.44,
+      "bytes": 241660
+    },
+    "ogre-mage": {
+      "glb": "./r/3d/minis/ogre-mage.glb",
+      "pedestal": "horde",
+      "height": 3.55,
+      "bytes": 198596
+    },
+    "old-murk-eye": {
+      "glb": "./r/3d/minis/old-murk-eye.glb",
+      "pedestal": "beast",
+      "height": 2.84,
+      "bytes": 345668
+    },
+    "onu": {
+      "glb": "./r/3d/minis/onu.glb",
+      "pedestal": "cenarion",
+      "height": 9.34,
+      "bytes": 347784
+    },
+    "orgrim-doomhammer": {
+      "glb": "./r/3d/minis/orgrim-doomhammer.glb",
+      "pedestal": "blackrock",
+      "height": 3.43,
+      "bytes": 522908
+    },
+    "plague-farmer": {
+      "glb": "./r/3d/minis/plague-farmer.glb",
+      "pedestal": "undead",
+      "height": 2.96,
+      "bytes": 284684
+    },
+    "priestess": {
+      "glb": "./r/3d/minis/priestess.glb",
+      "pedestal": "alliance",
+      "height": 2.89,
+      "bytes": 209912
+    },
+    "prowler": {
+      "glb": "./r/3d/minis/prowler.glb",
+      "pedestal": "beast",
+      "height": 6.56,
+      "bytes": 1303308
+    },
+    "pyromancer": {
+      "glb": "./r/3d/minis/pyromancer.glb",
+      "pedestal": "blackrock",
+      "height": 3.07,
+      "bytes": 343700
+    },
+    "quilboar": {
+      "glb": "./r/3d/minis/quilboar.glb",
+      "pedestal": "beast",
+      "height": 3.52,
+      "bytes": 216132
+    },
+    "ragnaros": {
+      "glb": "./r/3d/minis/ragnaros.glb",
+      "pedestal": "blackrock",
+      "height": 9.11,
+      "bytes": 410664
+    },
+    "raptors": {
+      "glb": "./r/3d/minis/raptors.glb",
+      "pedestal": "beast",
+      "height": 2.65,
+      "bytes": 189668
+    },
+    "rend-blackhand": {
+      "glb": "./r/3d/minis/rend-blackhand.glb",
+      "pedestal": "blackrock",
+      "height": 4.56,
+      "bytes": 449548
+    },
+    "s-a-f-e-pilot": {
+      "glb": "./r/3d/minis/s-a-f-e-pilot.glb",
+      "pedestal": "alliance",
+      "height": 3.35,
+      "bytes": 380884
+    },
+    "skeleton-party": {
+      "glb": "./r/3d/minis/skeleton-party.glb",
+      "pedestal": "undead",
+      "height": 2.93,
+      "bytes": 240392
+    },
+    "skeletons": {
+      "glb": "./r/3d/minis/skeletons.glb",
+      "pedestal": "undead",
+      "height": 2.55,
+      "bytes": 280320
+    },
+    "sneed": {
+      "glb": "./r/3d/minis/sneed.glb",
+      "pedestal": "horde",
+      "height": 4.84,
+      "bytes": 318280
+    },
+    "spiderlings": {
+      "glb": "./r/3d/minis/spiderlings.glb",
+      "pedestal": "beast",
+      "height": 2.63,
+      "bytes": 31176
+    },
+    "stonehoof-tauren": {
+      "glb": "./r/3d/minis/stonehoof-tauren.glb",
+      "pedestal": "horde",
+      "height": 5.16,
+      "bytes": 266580
+    },
+    "swole-troll": {
+      "glb": "./r/3d/minis/swole-troll.glb",
+      "pedestal": "horde",
+      "height": 5.09,
+      "bytes": 254732
+    },
+    "sylvanas-windrunner": {
+      "glb": "./r/3d/minis/sylvanas-windrunner.glb",
+      "pedestal": "horde",
+      "height": 7.7,
+      "bytes": 470340
+    },
+    "thrall": {
+      "glb": "./r/3d/minis/thrall.glb",
+      "pedestal": "horde",
+      "height": 4.38,
+      "bytes": 335948
+    },
+    "tirion-fordring": {
+      "glb": "./r/3d/minis/tirion-fordring.glb",
+      "pedestal": "alliance",
+      "height": 3.12,
+      "bytes": 262636
+    },
+    "treant": {
+      "glb": "./r/3d/minis/treant.glb",
+      "pedestal": "cenarion",
+      "height": 2.77,
+      "bytes": 141828
+    },
+    "vultures": {
+      "glb": "./r/3d/minis/vultures.glb",
+      "pedestal": "beast",
+      "height": 2.38,
+      "bytes": 161040
+    },
+    "warsong-grunts": {
+      "glb": "./r/3d/minis/warsong-grunts.glb",
+      "pedestal": "horde",
+      "height": 3.2,
+      "bytes": 206664
+    },
+    "warsong-raider": {
+      "glb": "./r/3d/minis/warsong-raider.glb",
+      "pedestal": "horde",
+      "height": 3.4,
+      "bytes": 422640
+    },
+    "whelp-eggs": {
+      "glb": "./r/3d/minis/whelp-eggs.glb",
+      "pedestal": "blackrock",
+      "height": 1.77,
+      "bytes": 342504
+    },
+    "witch-doctor": {
+      "glb": "./r/3d/minis/witch-doctor.glb",
+      "pedestal": "horde",
+      "height": 4.28,
+      "bytes": 314896
+    },
+    "worgen": {
+      "glb": "./r/3d/minis/worgen.glb",
+      "pedestal": "alliance",
+      "height": 6.56,
+      "bytes": 1304484
+    },
+    "ysera": {
+      "glb": "./r/3d/minis/ysera.glb",
+      "pedestal": "cenarion",
+      "height": 21.08,
+      "bytes": 697304
+    },
+    "kobold-miner": {
+      "glb": "./r/3d/poi/kobold-miner.glb",
+      "pedestal": "neutral",
+      "height": 3.38,
+      "bytes": 244456,
+      "noPedestal": false
+    },
+    "onyxia-warder": {
+      "glb": "./r/3d/poi/onyxia-warder.glb",
+      "pedestal": "blackrock",
+      "height": 3.721,
+      "bytes": 179500,
+      "noPedestal": false
+    },
+    "onyxia-egg": {
+      "glb": "./r/3d/poi/onyxia-egg.glb",
+      "pedestal": "blackrock",
+      "height": 1.588,
+      "bytes": 116332,
+      "noPedestal": true
+    },
+    "onyxia-whelp": {
+      "glb": "./r/3d/poi/onyxia-whelp.glb",
+      "pedestal": "blackrock",
+      "height": 1.266,
+      "bytes": 255408,
+      "noPedestal": false
+    },
+    "player-whelp": {
+      "glb": "./r/3d/poi/onyxia-whelp.glb",
+      "pedestal": "blackrock",
+      "height": 1.266,
+      "bytes": 255408,
+      "noPedestal": false
+    },
+    "spirit-wolf": {
+      "glb": "./r/3d/poi/spirit-wolf.glb",
+      "pedestal": "horde",
+      "height": 1.683,
+      "bytes": 155484,
+      "noPedestal": false
+    },
+    "skeleton-minion": {
+      "glb": "./r/3d/poi/skeleton-minion.glb",
+      "pedestal": "undead",
+      "height": 1.989,
+      "bytes": 228400,
+      "noPedestal": false
+    },
+    "onyxia": {
+      "glb": "./r/3d/poi/onyxia-boss.glb",
+      "pedestal": "blackrock",
+      "height": 9.881,
+      "bytes": 744340,
+      "noPedestal": true
+    }
+  }
+}

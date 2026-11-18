@@ -23,6 +23,8 @@ const MIME_TYPES = {
   '.woff2': 'font/woff2',
   '.woff': 'font/woff',
   '.ico': 'image/x-icon',
+  '.glb': 'model/gltf-binary',
+  '.gltf': 'model/gltf+json',
 };
 
 function parseArgs(argv) {

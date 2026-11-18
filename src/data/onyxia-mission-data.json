@@ -1,0 +1,1033 @@
+{
+  "source": "TACT/missiondata_onyxia_v1.bundle (TextAsset:Onyxia)",
+  "cameraBounds": {
+    "cx": 0.0,
+    "cz": 39.0,
+    "width": 56.0,
+    "depth": 114.0
+  },
+  "unwalkables": [
+    {
+      "id": "Onyxia_Unwalkable01_Mesh",
+      "cx": 9.65,
+      "cz": 15.81,
+      "rx": 4.12,
+      "rz": 5.38
+    },
+    {
+      "id": "Onyxia_Unwalkable02_Mesh",
+      "cx": -10.13,
+      "cz": 22.38,
+      "rx": 3.84,
+      "rz": 10.7
+    },
+    {
+      "id": "Onyxia_Unwalkable03_Mesh",
+      "cx": 1.83,
+      "cz": 38.23,
+      "rx": 4.42,
+      "rz": 5.26
+    },
+    {
+      "id": "Onyxia_Unwalkable04_Mesh",
+      "cx": -2.62,
+      "cz": 56.4,
+      "rx": 6.51,
+      "rz": 4.13
+    }
+  ],
+  "roads": [
+    {
+      "guid": "04137bfdef0e4394b497e0ac579b7081",
+      "name": "Middle Path 4",
+      "x": -7.5,
+      "z": 32.0,
+      "goals": [
+        {
+          "road": "8de4ab58d57743bd8380593127fa5fe0",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "11408c3ffc8842d3bced222942427f28",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "04cff3ef0efc4016b1bc921df5ce9706",
+      "name": "West Path 10",
+      "x": -12.0,
+      "z": 57.0,
+      "goals": [
+        {
+          "road": "9b26825236e344ac8c0a603e3278b24d",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "a594d3eb4abc4755bf62484083e1bbe9",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "11408c3ffc8842d3bced222942427f28",
+      "name": "Middle Path 3",
+      "x": -2.0,
+      "z": 25.0,
+      "goals": [
+        {
+          "road": "04137bfdef0e4394b497e0ac579b7081",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "4d19ba50b5d446b09d24f1a3203a3915",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "16dfcb5dd3ca41b8a312f33fc81d53c5",
+      "name": "East Path 2",
+      "x": 18.5,
+      "z": 10.0,
+      "goals": [
+        {
+          "road": "7e96d3d139fe418c945d7fcee4d756d0",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "626713cb907240248e1343b4a2dc3ee7",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "1fb8151c4859419f8cc691acec10025c",
+      "name": "East Path 11",
+      "x": 10.5,
+      "z": 58.5,
+      "goals": [
+        {
+          "road": "f193267b8f96402d89e6da9ac23942bd",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "2158887fa6ff4cc7ada3125295f6330d",
+      "name": "Mid to East Traverse",
+      "x": 6.0,
+      "z": 27.5,
+      "goals": [
+        {
+          "road": "d76e8269d8b94d11bc7649b9e92d7e92",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "4d19ba50b5d446b09d24f1a3203a3915",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "2aa41bc565594b5d860d0c9dc592b5ee",
+      "name": "West Path 2",
+      "x": -17.0,
+      "z": 12.0,
+      "goals": [
+        {
+          "road": "db513dd54d50452da6b8499e8be437a5",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "860f73253bad437281a80c8155b6da3c",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "432bb49c8ab940a5887cb97facdda08a",
+      "name": "West Path 5",
+      "x": -19.0,
+      "z": 29.0,
+      "goals": [
+        {
+          "road": "65ca80cbcb184e538fc8a02fa01f52d6",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "b1d9fbeb99b3438fa18560011ead8e5d",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "4d19ba50b5d446b09d24f1a3203a3915",
+      "name": "Middle Path 2",
+      "x": -2.0,
+      "z": 18.5,
+      "goals": [
+        {
+          "road": "11408c3ffc8842d3bced222942427f28",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "9b990e5a87ac4e3f818729e8054de7d1",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "4f78e3e9c3394c3980d35c002a5edad9",
+      "name": "Middle Path 9",
+      "x": 8.0,
+      "z": 54.0,
+      "goals": [
+        {
+          "road": "1fb8151c4859419f8cc691acec10025c",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "9d79921c9b9c41d091e26915e5a81767",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "58437d7cb99e4a6394855e4204e25180",
+      "name": "West Path 7",
+      "x": -16.5,
+      "z": 44.0,
+      "goals": [
+        {
+          "road": "da61a3782d534ae2874a6e359e3c28b2",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "65ca80cbcb184e538fc8a02fa01f52d6",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "5f91ecb289bd4ccbb4b1a22d119e9b6a",
+      "name": "East Path 10",
+      "x": 12.0,
+      "z": 50.0,
+      "goals": [
+        {
+          "road": "1fb8151c4859419f8cc691acec10025c",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "bd4b12f6448d49df93c27f6bbd350c79",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "6112bcd8aa3947dbb543c85a059dbd89",
+      "name": "East Path 5",
+      "x": 17.5,
+      "z": 23.5,
+      "goals": [
+        {
+          "road": "d76e8269d8b94d11bc7649b9e92d7e92",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "a80342e06cc5441da427a5b5a8d7bb8c",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "626713cb907240248e1343b4a2dc3ee7",
+      "name": "East Path 1",
+      "x": 16.0,
+      "z": 6.0,
+      "goals": [
+        {
+          "road": "16dfcb5dd3ca41b8a312f33fc81d53c5",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "65ca80cbcb184e538fc8a02fa01f52d6",
+      "name": "West Path 6",
+      "x": -17.0,
+      "z": 37.0,
+      "goals": [
+        {
+          "road": "58437d7cb99e4a6394855e4204e25180",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "432bb49c8ab940a5887cb97facdda08a",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "7e96d3d139fe418c945d7fcee4d756d0",
+      "name": "East Path 3",
+      "x": 19.0,
+      "z": 16.0,
+      "goals": [
+        {
+          "road": "a80342e06cc5441da427a5b5a8d7bb8c",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "16dfcb5dd3ca41b8a312f33fc81d53c5",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "860f73253bad437281a80c8155b6da3c",
+      "name": "West Path 1",
+      "x": -15.5,
+      "z": 7.0,
+      "goals": [
+        {
+          "road": "2aa41bc565594b5d860d0c9dc592b5ee",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "8de4ab58d57743bd8380593127fa5fe0",
+      "name": "Middle Path 5",
+      "x": -8.5,
+      "z": 37.0,
+      "goals": [
+        {
+          "road": "ca507f0a45fb43fbbc6655817ceefa03",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "04137bfdef0e4394b497e0ac579b7081",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "904429cbe50b46f18b6209f8e68b1827",
+      "name": "Middle Path 7",
+      "x": -4.5,
+      "z": 47.5,
+      "goals": [
+        {
+          "road": "9d79921c9b9c41d091e26915e5a81767",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "9b26825236e344ac8c0a603e3278b24d",
+      "name": "West Path 11",
+      "x": -8.5,
+      "z": 61.5,
+      "goals": [
+        {
+          "road": "",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "04cff3ef0efc4016b1bc921df5ce9706",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "9b990e5a87ac4e3f818729e8054de7d1",
+      "name": "Middle Path 1",
+      "x": -1.0,
+      "z": 14.5,
+      "goals": [
+        {
+          "road": "4d19ba50b5d446b09d24f1a3203a3915",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "f4df94de14e64d5e95e25d36346170a4",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "9d79921c9b9c41d091e26915e5a81767",
+      "name": "Middle Path 8",
+      "x": 5.0,
+      "z": 50.0,
+      "goals": [
+        {
+          "road": "4f78e3e9c3394c3980d35c002a5edad9",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "904429cbe50b46f18b6209f8e68b1827",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "9fac8db7fbcf453a96187ca0e878c1ea",
+      "name": "East Path 7",
+      "x": 13.0,
+      "z": 37.0,
+      "goals": [
+        {
+          "road": "b5a41269b0f9421f9fce96eea7d2aa4f",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "d76e8269d8b94d11bc7649b9e92d7e92",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "a594d3eb4abc4755bf62484083e1bbe9",
+      "name": "West Path 9",
+      "x": -14.5,
+      "z": 54.5,
+      "goals": [
+        {
+          "road": "04cff3ef0efc4016b1bc921df5ce9706",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "da61a3782d534ae2874a6e359e3c28b2",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "a80342e06cc5441da427a5b5a8d7bb8c",
+      "name": "East Path 4",
+      "x": 18.0,
+      "z": 19.5,
+      "goals": [
+        {
+          "road": "6112bcd8aa3947dbb543c85a059dbd89",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "7e96d3d139fe418c945d7fcee4d756d0",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "b1d9fbeb99b3438fa18560011ead8e5d",
+      "name": "West Path 4",
+      "x": -18.0,
+      "z": 24.0,
+      "goals": [
+        {
+          "road": "432bb49c8ab940a5887cb97facdda08a",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "db513dd54d50452da6b8499e8be437a5",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "b5a41269b0f9421f9fce96eea7d2aa4f",
+      "name": "East Path 8",
+      "x": 13.0,
+      "z": 39.0,
+      "goals": [
+        {
+          "road": "bd4b12f6448d49df93c27f6bbd350c79",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "9fac8db7fbcf453a96187ca0e878c1ea",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "bd4b12f6448d49df93c27f6bbd350c79",
+      "name": "East Path 9",
+      "x": 12.0,
+      "z": 43.5,
+      "goals": [
+        {
+          "road": "5f91ecb289bd4ccbb4b1a22d119e9b6a",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "b5a41269b0f9421f9fce96eea7d2aa4f",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "ca507f0a45fb43fbbc6655817ceefa03",
+      "name": "Middle Path 6",
+      "x": -8.0,
+      "z": 41.5,
+      "goals": [
+        {
+          "road": "904429cbe50b46f18b6209f8e68b1827",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "8de4ab58d57743bd8380593127fa5fe0",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "d76e8269d8b94d11bc7649b9e92d7e92",
+      "name": "East Path 6",
+      "x": 12.5,
+      "z": 33.0,
+      "goals": [
+        {
+          "road": "9fac8db7fbcf453a96187ca0e878c1ea",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "da61a3782d534ae2874a6e359e3c28b2",
+      "name": "West Path 8",
+      "x": -15.0,
+      "z": 51.0,
+      "goals": [
+        {
+          "road": "a594d3eb4abc4755bf62484083e1bbe9",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "db513dd54d50452da6b8499e8be437a5",
+      "name": "West Path 3",
+      "x": -18.5,
+      "z": 19.5,
+      "goals": [
+        {
+          "road": "b1d9fbeb99b3438fa18560011ead8e5d",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "2aa41bc565594b5d860d0c9dc592b5ee",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "f193267b8f96402d89e6da9ac23942bd",
+      "name": "East Path 12",
+      "x": 7.5,
+      "z": 63.0,
+      "goals": [
+        {
+          "road": "",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "1fb8151c4859419f8cc691acec10025c",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "f4df94de14e64d5e95e25d36346170a4",
+      "name": "Middle Path 0",
+      "x": 0.0,
+      "z": 9.0,
+      "goals": [
+        {
+          "road": "9b990e5a87ac4e3f818729e8054de7d1",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    }
+  ],
+  "switches": [
+    {
+      "guid": "0a5e3979fbd94eff9898b06c71c8dc6d",
+      "name": "East Lane Switch",
+      "x": 12.5,
+      "z": 32.0,
+      "choices": [
+        "2158887fa6ff4cc7ada3125295f6330d",
+        "6112bcd8aa3947dbb543c85a059dbd89"
+      ]
+    },
+    {
+      "guid": "25da92d7e3044bdfbaab025c89fe69b7",
+      "name": "Tower 2 Switch",
+      "x": -12.0,
+      "z": 44.0,
+      "choices": [
+        "65ca80cbcb184e538fc8a02fa01f52d6",
+        "8de4ab58d57743bd8380593127fa5fe0"
+      ]
+    },
+    {
+      "guid": "26128d8458d24516a16189e2e0a67ffc",
+      "name": "Tower 3 Switch",
+      "x": 12.0,
+      "z": 50.0,
+      "choices": [
+        "9d79921c9b9c41d091e26915e5a81767",
+        "bd4b12f6448d49df93c27f6bbd350c79"
+      ]
+    }
+  ],
+  "deployAreas": [
+    {
+      "guid": "7be9941b454a48af82809173af6bc2c1",
+      "name": "Boss Deploy 2",
+      "unitGuid": "4d1f49832d7f4a638de57424df786bea",
+      "x": 9.0,
+      "z": 71.0,
+      "width": 3.0,
+      "depth": 3.0,
+      "goals": [
+        {
+          "road": "",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "f193267b8f96402d89e6da9ac23942bd",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "83369df24b354a0a906f46a675f0beb3",
+      "name": "Tower 1 Deploy 1",
+      "unitGuid": "a3e271ba03014d8d88deb137dd551bdd",
+      "x": -5.0,
+      "z": 25.0,
+      "width": 6.0,
+      "depth": 12.0,
+      "goals": [
+        {
+          "road": "04137bfdef0e4394b497e0ac579b7081",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "4d19ba50b5d446b09d24f1a3203a3915",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "aa7125a137704f72857e0ad3addaebb0",
+      "name": "Tower 2 Deploy 2",
+      "unitGuid": "4a3ec2d63b5d479583ad0e38bee67ffa",
+      "x": -9.0,
+      "z": 44.0,
+      "width": 6.0,
+      "depth": 12.0,
+      "goals": [
+        {
+          "road": "904429cbe50b46f18b6209f8e68b1827",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "8de4ab58d57743bd8380593127fa5fe0",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "adf2f78c77d04a4a8a6167c10089c181",
+      "name": "Tower 1 Deploy 2",
+      "unitGuid": "a3e271ba03014d8d88deb137dd551bdd",
+      "x": 1.0,
+      "z": 25.0,
+      "width": 6.0,
+      "depth": 12.0,
+      "goals": [
+        {
+          "road": "2158887fa6ff4cc7ada3125295f6330d",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "4d19ba50b5d446b09d24f1a3203a3915",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "c70b90be05e6488ba36790379f215a4f",
+      "name": "Tower 3 Deploy",
+      "unitGuid": "d157ae335d2045cb83c56fc2bc83432b",
+      "x": 12.0,
+      "z": 50.0,
+      "width": 12.0,
+      "depth": 12.0,
+      "goals": [
+        {
+          "road": "1fb8151c4859419f8cc691acec10025c",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "bd4b12f6448d49df93c27f6bbd350c79",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "e836d1e9e1024a8797e5239887d220b1",
+      "name": "Boss Deploy 1",
+      "unitGuid": "4d1f49832d7f4a638de57424df786bea",
+      "x": -9.0,
+      "z": 71.0,
+      "width": 3.0,
+      "depth": 3.0,
+      "goals": [
+        {
+          "road": "",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "9b26825236e344ac8c0a603e3278b24d",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "eb8256abfd8e47719aed14164b546212",
+      "name": "Player Deploy 1",
+      "unitGuid": "d316f315c39d482c87dfbd9a4a5a036d",
+      "x": -10.0,
+      "z": 0.0,
+      "width": 10.0,
+      "depth": 14.0,
+      "goals": [
+        {
+          "road": "860f73253bad437281a80c8155b6da3c",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "ec564609c51f4534a1833a8ed1167ce0",
+      "name": "Tower 2 Deploy 1",
+      "unitGuid": "4a3ec2d63b5d479583ad0e38bee67ffa",
+      "x": -15.0,
+      "z": 44.0,
+      "width": 6.0,
+      "depth": 12.0,
+      "goals": [
+        {
+          "road": "da61a3782d534ae2874a6e359e3c28b2",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "65ca80cbcb184e538fc8a02fa01f52d6",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "fb6f8c650c2f4541bca33e6a6a239ea1",
+      "name": "Player Deploy 2",
+      "unitGuid": "d316f315c39d482c87dfbd9a4a5a036d",
+      "x": 0.0,
+      "z": 0.0,
+      "width": 10.0,
+      "depth": 14.0,
+      "goals": [
+        {
+          "road": "f4df94de14e64d5e95e25d36346170a4",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    },
+    {
+      "guid": "fca4bbeb39ec484d867eefccab3463d6",
+      "name": "Player Deploy 3",
+      "unitGuid": "d316f315c39d482c87dfbd9a4a5a036d",
+      "x": 10.0,
+      "z": 0.0,
+      "width": 10.0,
+      "depth": 14.0,
+      "goals": [
+        {
+          "road": "626713cb907240248e1343b4a2dc3ee7",
+          "teamDirection": "TowardsTop"
+        },
+        {
+          "road": "",
+          "teamDirection": "TowardsBottom"
+        }
+      ]
+    }
+  ],
+  "units": [
+    {
+      "guid": "028adaa1a3234278b4b3b04d10250101",
+      "name": "Gold Mine 3",
+      "x": 23.0,
+      "z": 20.0
+    },
+    {
+      "guid": "07dc05f7d5f54593842c69922e04fb67",
+      "name": "CaveIn Center Target",
+      "x": 0.0,
+      "z": 52.0
+    },
+    {
+      "guid": "3168481ca8d641299e0c8024db4920a0",
+      "name": "CaveIn Elemental Spawner 3",
+      "x": -19.0,
+      "z": 30.0
+    },
+    {
+      "guid": "3b0c1d35b642416bb061cbbff3623983",
+      "name": "Egg Spawner 1-1",
+      "x": -20.0,
+      "z": 34.5
+    },
+    {
+      "guid": "42a5dabf98e24985bb419fad640ed53d",
+      "name": "Treasure Chest 2",
+      "x": 0.0,
+      "z": 49.0
+    },
+    {
+      "guid": "4a3ec2d63b5d479583ad0e38bee67ffa",
+      "name": "Tower 2",
+      "x": -12.0,
+      "z": 44.0
+    },
+    {
+      "guid": "4d1f49832d7f4a638de57424df786bea",
+      "name": "Onyxia",
+      "x": 0.0,
+      "z": 78.5
+    },
+    {
+      "guid": "565b8585b2894e1ebad51968f1b8edcc",
+      "name": "Egg Spawner 1-4",
+      "x": -21.0,
+      "z": 21.0
+    },
+    {
+      "guid": "62cde131b306498e907a3205af4a1ade",
+      "name": "Egg Spawner 1-3",
+      "x": -21.0,
+      "z": 27.0
+    },
+    {
+      "guid": "6bc0e4bdb8784451a8170052e413154c",
+      "name": "Treasure Chest 1",
+      "x": 3.0,
+      "z": 13.5
+    },
+    {
+      "guid": "72d80dae5c3f4f9597a0295797ce845f",
+      "name": "Gold Mine 1",
+      "x": -22.0,
+      "z": 24.0
+    },
+    {
+      "guid": "7fd5f8d719424299b3e77674a6e4c134",
+      "name": "Egg Spawner 1-6",
+      "x": -20.5,
+      "z": 19.0
+    },
+    {
+      "guid": "8c2c693d7c124c2fb48c2fa933c462e3",
+      "name": "Egg Spawner 1-5",
+      "x": -16.0,
+      "z": 20.5
+    },
+    {
+      "guid": "91b7d5850d2e4054a65ec0a62fb49642",
+      "name": "Gold Mine 4",
+      "x": -16.0,
+      "z": 60.0
+    },
+    {
+      "guid": "971e2694a0ba4367baa62fe8a4069cd2",
+      "name": "Egg Spawner 2-5",
+      "x": 22.5,
+      "z": 14.0
+    },
+    {
+      "guid": "9a2d1febf05f4850bf011a2d4e9710aa",
+      "name": "Egg Spawner 2-6",
+      "x": 16.5,
+      "z": 13.5
+    },
+    {
+      "guid": "9c6d32b488dd4012aa2bcf5567179cf7",
+      "name": "Egg Spawner 2-7",
+      "x": 22.0,
+      "z": 12.0
+    },
+    {
+      "guid": "9cd4da2d433b49b9b39521e1e45ed656",
+      "name": "CaveIn Warder Spawner 2",
+      "x": 6.0,
+      "z": 65.0
+    },
+    {
+      "guid": "a3e271ba03014d8d88deb137dd551bdd",
+      "name": "Tower 1",
+      "x": -2.0,
+      "z": 25.0
+    },
+    {
+      "guid": "abcda0279e974d41bbd5afc7e1e804d1",
+      "name": "Egg Spawner 1-8",
+      "x": -18.5,
+      "z": 13.5
+    },
+    {
+      "guid": "b0969eeeda0c4e21b6d74ed6ee1493b4",
+      "name": "CaveIn Warder Spawner 1",
+      "x": -6.0,
+      "z": 65.0
+    },
+    {
+      "guid": "b54bb9e42c2f4e888bfe14ddf1686035",
+      "name": "Egg Spawner 2-3",
+      "x": 22.5,
+      "z": 17.5
+    },
+    {
+      "guid": "c0072af5d6df4f9f8f0d41c49e893002",
+      "name": "CaveIn Elemental Spawner 4",
+      "x": 18.5,
+      "z": 22.0
+    },
+    {
+      "guid": "ce4e6063bfa14941ac142a485f48eaab",
+      "name": "Egg Spawner 1-2",
+      "x": -16.5,
+      "z": 29.0
+    },
+    {
+      "guid": "d157ae335d2045cb83c56fc2bc83432b",
+      "name": "Tower 3",
+      "x": 12.0,
+      "z": 50.0
+    },
+    {
+      "guid": "d316f315c39d482c87dfbd9a4a5a036d",
+      "name": "HomeBase",
+      "x": 0.0,
+      "z": 0.0
+    },
+    {
+      "guid": "dc900bd33e8d40f5b13a8d5e95daec17",
+      "name": "Gold Mine 2",
+      "x": 8.0,
+      "z": 38.0
+    },
+    {
+      "guid": "df9a788f62fb4eea9c6e7bf903de2f37",
+      "name": "Egg Spawner 2-4",
+      "x": 21.5,
+      "z": 15.5
+    },
+    {
+      "guid": "e317eb982d784fa39f12f2f0febca8f8",
+      "name": "CaveIn Elemental Spawner 2",
+      "x": 10.0,
+      "z": 60.0
+    },
+    {
+      "guid": "ee59ef5bc7b04da7b41ab117c6a469f2",
+      "name": "CaveIn Elemental Spawner 1",
+      "x": -14.0,
+      "z": 55.0
+    },
+    {
+      "guid": "f0d5389e4b634dc2b5b0f4c244f6f325",
+      "name": "Egg Spawner 1-7",
+      "x": -14.5,
+      "z": 16.5
+    },
+    {
+      "guid": "f38064a1c51249a29054ca8e1cc4fa96",
+      "name": "Egg Spawner 2-1",
+      "x": 20.0,
+      "z": 24.5
+    },
+    {
+      "guid": "f86509d1275945398700984f927fd92e",
+      "name": "Egg Spawner 2-2",
+      "x": 16.0,
+      "z": 21.0
+    },
+    {
+      "guid": "feed561ad1c34b66804ce6db96de9856",
+      "name": "Egg Spawner 2-8",
+      "x": 19.5,
+      "z": 9.0
+    }
+  ],
+  "onyxiaTaunts": [
+    "你好，冒险者。胜利就在眼前。",
+    "加时！",
+    "哦……",
+    "啊……",
+    "一位强力的主将，选的不错。",
+    "欢迎回来。",
+    "听到战斗的号角声了吗，快来吧……",
+    "还剩60秒……快抓紧时间！",
+    "嗯……",
+    "真走运……我的下一餐自己送上门来了。",
+    "做得好。",
+    "还剩10秒！",
+    "想再试试手气吗？",
+    "啊，又能痛击你的敌人了。",
+    "你会付出代价的！",
+    "要明白你的处境！"
+  ]
+}

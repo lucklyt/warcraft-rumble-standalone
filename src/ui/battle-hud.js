@@ -1,7 +1,9 @@
 import { CombatSimulation, TICK_DT } from '../engine/combat-sim.js';
+import { ONYXIA_POS, UNWALKABLE_OBSTACLES } from '../engine/onyxia-map.js';
 import { tickPlayerAutopilot } from '../engine/player-autopilot.js';
 import { getUnitCombatSpec, resolveMiniSprite } from '../engine/unit-stats.js';
-import { BattleRenderer } from '../render/battle-renderer.js';
+import { BattleRenderer3D } from '../render/battle-renderer-3d.js';
+import { preloadDeckModels } from '../render/model-cache.js';
 import { normalizeAssetPath, preloadBattleAssets } from '../render/asset-loader.js';
 import { sfx } from '../audio/sfx.js';
 
@@ -50,78 +52,131 @@ export class BattleController {
     this.outcomeRecorded = false;
     this.lastHandKey = '';
 
+    this._panning = false;
+    this._panMoved = 0;
+    this._panLastY = 0;
+    this._keysHeld = new Set();
+
+    // Pooled 2D overlays over 3D canvas
+    this._hpOverlayPool = new Map();
+    this._textOverlayPool = new Map();
+
     this._onKeyDown = this._handleKeyDown.bind(this);
+    this._onKeyUp = (e) => this._keysHeld.delete(e.code);
   }
 
   mount() {
+    const allSlugs = [
+      this.deck.leader.slug,
+      ...this.deck.troops.map((t) => t.slug),
+      'kobold-miner',
+      'drake',
+      'gargoyle',
+      'gryphon-rider',
+      'necromancer',
+      'spiderlings',
+      'warsong-grunts',
+      'earth-elemental',
+      'spirit-wolf',
+      'skeleton-minion',
+    ];
     const deckSprites = [
       resolveMiniSprite(this.deck.leader.slug),
       ...this.deck.troops.map((t) => resolveMiniSprite(t.slug)),
     ];
     preloadBattleAssets(deckSprites);
+    preloadDeckModels(allSlugs);
 
     this.root.innerHTML = `
-      <div class="wr-battle-shell">
-        <div class="wr-battle-topbar">
-          <div class="wr-boss-bar-row">
-            <img id="wr-boss-mood" class="wr-boss-mood" src="./r/onyxia/Onyxia_Smug.webp" alt="奥妮克希亚" />
-            <div class="wr-boss-hp-wrap">
-              <div class="wr-boss-hp-meta">
-                <span id="wr-boss-title"><strong>奥妮克希亚</strong> · P1 (${esc(this.difficulty.nameZh)})</span>
-                <span id="wr-boss-hp-text" style="font-family:var(--font-numbers);">18,000 / 18,000 (100%)</span>
+      <div class="wr-battle-shell wr-3d-mode">
+        <div class="wr-canvas-stage" id="wr-stage">
+          <canvas id="wr-battle-canvas" class="wr-battle-canvas-3d"></canvas>
+          <div id="wr-world-overlays" class="wr-world-overlays"></div>
+
+          <!-- Top HUD Overlay -->
+          <div class="wr-hud-top">
+            <div class="wr-boss-plate">
+              <div class="wr-boss-portrait-wrap">
+                <img id="wr-boss-mood" class="wr-boss-mood" src="./r/onyxia/Onyxia_Smug.webp" alt="奥妮克希亚" />
+                <div id="wr-boss-phase-badge" class="wr-boss-phase-badge">P1</div>
               </div>
-              <div class="wr-boss-hp-track">
-                <div id="wr-boss-hp-fill" class="wr-boss-hp-fill" style="width:100%;"></div>
-                <div class="wr-boss-notch" style="left:40%;" title="40% P3转阶段"></div>
-                <div class="wr-boss-notch" style="left:70%;" title="70% P2转阶段"></div>
+              <div class="wr-boss-hp-col">
+                <div class="wr-boss-hp-meta">
+                  <span id="wr-boss-title"><strong>奥妮克希亚</strong> · ${esc(this.difficulty.nameZh)}</span>
+                  <span class="wr-boss-traits-inline" id="wr-boss-traits"></span>
+                  <span id="wr-boss-hp-text" style="font-family:var(--font-numbers);">18,000 / 18,000</span>
+                </div>
+                <div class="wr-boss-hp-track-hud">
+                  <div id="wr-boss-hp-fill" class="wr-boss-hp-fill" style="width:100%;"></div>
+                  <div class="wr-boss-notch" style="left:40%;" title="40% P3转阶段"></div>
+                  <div class="wr-boss-notch" style="left:70%;" title="70% P2转阶段"></div>
+                </div>
               </div>
+              <div class="wr-timer-frame">
+                <span id="wr-match-timer" class="wr-timer-val">6:00</span>
+                <span id="wr-egg-timer" class="wr-egg-sub">龙蛋 0:20</span>
+              </div>
+            </div>
+
+            <div class="wr-ctrl-strip">
+              <button type="button" class="wr-hud-chip" id="wr-auto-btn" title="AI 战术托管">AI 托管</button>
+              <button type="button" class="wr-hud-chip" id="wr-speed-btn" title="切换倍速">1x</button>
+              <button type="button" class="wr-hud-icon-btn" id="wr-pause-btn" title="暂停/继续 (Space)">
+                <img src="./r/hud/CombatHUD_Tex_IconPause.webp" alt="暂停" />
+              </button>
+              <button type="button" class="wr-hud-icon-btn" id="wr-restart-btn" title="重新开始">
+                <img src="./r/hud/CombatHUD_Tex_IconRestart.webp" alt="重开" />
+              </button>
+              <button type="button" class="wr-hud-chip danger" id="wr-exit-btn">退出</button>
             </div>
           </div>
 
-          <div class="wr-battle-ctrl-row">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span id="wr-match-timer" class="wr-timer-pill">6:00</span>
-              <span id="wr-egg-timer" class="wr-pill">下波龙蛋 0:20</span>
-              <span id="wr-boss-traits" class="wr-pill" style="display:none;"></span>
-            </div>
-            <div style="display:flex;align-items:center;gap:4px;">
-              <button type="button" class="wr-btn sm" id="wr-auto-btn">🤖 托管</button>
-              <button type="button" class="wr-btn sm" id="wr-speed-btn">1x</button>
-              <button type="button" class="wr-btn sm" id="wr-pause-btn">⏸ 暂停</button>
-              <button type="button" class="wr-btn sm" id="wr-restart-btn">🔄 重开</button>
-              <button type="button" class="wr-btn sm danger" id="wr-exit-btn">退出</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="wr-canvas-stage">
-          <canvas id="wr-battle-canvas" class="wr-battle-canvas"></canvas>
+          <div id="wr-boss-taunt" class="wr-boss-taunt" style="display:none;"></div>
           <div id="wr-battle-banner" class="wr-battle-banner" style="display:none;"></div>
-        </div>
 
-        <div class="wr-battle-tray">
-          <div class="wr-gold-row">
-            <div class="wr-gold-num">
-              <img src="./r/ui/gold-cost.webp" alt="金" />
-              <span id="wr-gold-val">4</span>
-            </div>
-            <div id="wr-gold-bars" class="wr-gold-bars">
-              ${Array.from({ length: 10 }, () => `<div class="wr-gold-seg"><div class="wr-gold-seg-fill" style="width:0%"></div></div>`).join('')}
-            </div>
+          <!-- Tactical Minimap & Camera Scrubber -->
+          <div class="wr-minimap-wrap" title="点击或拖动可快速移动战区视角（也可用滚轮或 W/S 键）">
+            <canvas id="wr-minimap" width="60" height="196"></canvas>
+            <span class="wr-minimap-hint">视角</span>
           </div>
-          <div id="wr-hand-row" class="wr-hand-row"></div>
+
+          <!-- Offscreen Keep Warning -->
+          <button type="button" id="wr-offscreen-warn" class="wr-offscreen-warn" style="display:none;" title="点击回防主基地">
+            <img src="./r/hud/CombatHUD_Tex_OffscreenIndicator.webp" alt="" />
+            <span>敌军逼近主基地</span>
+          </button>
+
+          <!-- Bottom Card Tray Overlay -->
+          <div class="wr-hud-bottom">
+            <div class="wr-gold-hud">
+              <div class="wr-gold-nugget-badge">
+                <img src="./r/hud/CombatHUD_Tex_GoldNugget.webp" alt="金" />
+                <span id="wr-gold-val">4</span>
+              </div>
+              <div id="wr-gold-bars" class="wr-gold-nugget-track">
+                ${Array.from(
+                  { length: 10 },
+                  () => `<div class="wr-gold-seg"><div class="wr-gold-seg-fill" style="width:0%"></div></div>`
+                ).join('')}
+              </div>
+            </div>
+            <div id="wr-hand-row" class="wr-hand-row-3d"></div>
+          </div>
         </div>
       </div>
     `;
 
     this.canvas = this.root.querySelector('#wr-battle-canvas');
-    this.renderer = new BattleRenderer(this.canvas);
+    this.minimapCanvas = this.root.querySelector('#wr-minimap');
+    this.overlaysEl = this.root.querySelector('#wr-world-overlays');
+    this.renderer = new BattleRenderer3D(this.canvas);
 
     this._bindControls();
     this._syncHandUI(true);
     this._syncHudUI();
 
     window.addEventListener('keydown', this._onKeyDown);
+    window.addEventListener('keyup', this._onKeyUp);
     this.lastFrameMs = performance.now();
     this.rafId = requestAnimationFrame((now) => this._loop(now));
   }
@@ -129,6 +184,10 @@ export class BattleController {
   destroy() {
     if (this.rafId) cancelAnimationFrame(this.rafId);
     window.removeEventListener('keydown', this._onKeyDown);
+    window.removeEventListener('keyup', this._onKeyUp);
+    this._hpOverlayPool.clear();
+    this._textOverlayPool.clear();
+    this.renderer?.destroy?.();
     this.modalRoot.classList.remove('open');
   }
 
@@ -136,8 +195,8 @@ export class BattleController {
     this.root.querySelector('#wr-auto-btn').addEventListener('click', () => {
       this.autopilot = !this.autopilot;
       const btn = this.root.querySelector('#wr-auto-btn');
-      btn.textContent = this.autopilot ? '🤖 托管中' : '🤖 托管';
-      btn.classList.toggle('green', this.autopilot);
+      btn.textContent = this.autopilot ? '托管中' : 'AI 托管';
+      btn.classList.toggle('active', this.autopilot);
       this.onToast?.(this.autopilot ? '已开启战术 AI 托管（仍可随时手动操作）' : '已切换回手动操作');
     });
 
@@ -147,10 +206,14 @@ export class BattleController {
       this.root.querySelector('#wr-speed-btn').textContent = `${this.speedMult}x`;
     });
 
-    this.root.querySelector('#wr-pause-btn').addEventListener('click', () => {
+    const togglePause = () => {
       this.paused = !this.paused;
-      this.root.querySelector('#wr-pause-btn').textContent = this.paused ? '▶ 继续' : '⏸ 暂停';
-    });
+      const img = this.root.querySelector('#wr-pause-btn img');
+      if (img) {
+        img.src = this.paused ? './r/hud/CombatHUD_Tex_IconPlay.webp' : './r/hud/CombatHUD_Tex_IconPause.webp';
+      }
+    };
+    this.root.querySelector('#wr-pause-btn').addEventListener('click', togglePause);
 
     this.root.querySelector('#wr-restart-btn').addEventListener('click', () => {
       this.modalRoot.classList.remove('open');
@@ -163,7 +226,12 @@ export class BattleController {
       this.paused = false;
       this.outcomeRecorded = false;
       this.selectedSlot = null;
-      this.root.querySelector('#wr-pause-btn').textContent = '⏸ 暂停';
+      this._hpOverlayPool.clear();
+      this._textOverlayPool.clear();
+      if (this.overlaysEl) this.overlaysEl.innerHTML = '';
+      this.renderer?.setFocusZ(16);
+      const img = this.root.querySelector('#wr-pause-btn img');
+      if (img) img.src = './r/hud/CombatHUD_Tex_IconPause.webp';
       this._syncHandUI(true);
     });
 
@@ -172,64 +240,99 @@ export class BattleController {
       this.onExitLobby();
     });
 
-    // Canvas pointer hover / click / drag drop
+    this.root.querySelector('#wr-offscreen-warn')?.addEventListener('click', () => {
+      this.renderer?.setFocusZ(10);
+    });
+
     const getWorldPos = (clientX, clientY) => {
       const rect = this.canvas.getBoundingClientRect();
-      const sx = clientX - rect.left;
-      const sy = clientY - rect.top;
-      return this.renderer.screenToWorld(sx, sy);
+      return this.renderer.screenToWorld(clientX - rect.left, clientY - rect.top);
     };
 
-    this.canvas.addEventListener('pointermove', (e) => {
-      this.hoverWorld = getWorldPos(e.clientX, e.clientY);
-    });
-
-    this.canvas.addEventListener('pointerleave', () => {
-      this.hoverWorld = null;
-    });
+    // Wheel scroll pans camera north/south across the 56x114 cavern
+    this.canvas.addEventListener(
+      'wheel',
+      (e) => {
+        e.preventDefault();
+        this.renderer.panByDeltaZ(-e.deltaY * 0.05);
+      },
+      { passive: false }
+    );
 
     this.canvas.addEventListener('pointerdown', (e) => {
-      const world = getWorldPos(e.clientX, e.clientY);
-      this.hoverWorld = world;
-
-      // Check clickable switch arrows first when not dragging a card
-      const hitSwitchId = this.renderer.findSwitchAtWorld(this.sim, world.x, world.y);
-      if (hitSwitchId && this.selectedSlot == null) {
-        const dir = this.sim.toggleSwitch(hitSwitchId);
-        this.onToast?.(`道岔已切换至：${dir === 'left' ? '◀ 左路' : '▶ 右路'}`);
-        return;
-      }
-
       if (this.selectedSlot != null) {
-        const res = this.sim.deployCard(this.selectedSlot, world.x, world.y);
+        const world = getWorldPos(e.clientX, e.clientY);
+        this.hoverWorld = world;
+        const res = this.sim.deployCard(this.selectedSlot, world.x, world.z);
         if (res.ok) {
           this.selectedSlot = null;
           this._syncHandUI(true);
         } else {
+          const hitSwitchId = this.renderer.findSwitchAtWorld(this.sim, world.x, world.z);
           if (hitSwitchId) {
             const dir = this.sim.toggleSwitch(hitSwitchId);
-            this.onToast?.(`道岔已切换至：${dir === 'left' ? '◀ 左路' : '▶ 右路'}`);
+            this.onToast?.(`道岔已切换：${dir === 'left' ? '左路分支' : '右路分支'}`);
           } else {
             this.onToast?.(res.reason || '无法在此位置部署');
+          }
+        }
+        return;
+      }
+
+      // Pan battlefield vertically when no card is selected
+      this._panning = true;
+      this._panMoved = 0;
+      this._panLastY = e.clientY;
+    });
+
+    this.canvas.addEventListener('pointermove', (e) => {
+      this.hoverWorld = getWorldPos(e.clientX, e.clientY);
+      if (this._panning) {
+        const dy = e.clientY - this._panLastY;
+        this._panLastY = e.clientY;
+        this._panMoved += Math.abs(dy);
+        this.renderer.panByDeltaZ(dy * 0.14);
+      }
+    });
+
+    this.canvas.addEventListener('pointerup', (e) => {
+      if (this._panning) {
+        const wasClick = this._panMoved < 8;
+        this._panning = false;
+        if (wasClick) {
+          const world = getWorldPos(e.clientX, e.clientY);
+          const hitSwitchId = this.renderer.findSwitchAtWorld(this.sim, world.x, world.z);
+          if (hitSwitchId) {
+            const dir = this.sim.toggleSwitch(hitSwitchId);
+            this.onToast?.(`道岔已切换：${dir === 'left' ? '左路分支' : '右路分支'}`);
           }
         }
       }
     });
 
-    // Support drag-from-hand onto canvas release
+    this.canvas.addEventListener('pointerleave', () => {
+      this.hoverWorld = null;
+      this._panning = false;
+    });
+
+    // Support drag-from-hand onto 3D viewport
+    window.addEventListener('pointermove', (e) => {
+      if (this.draggingSlot != null) {
+        const rect = this.canvas.getBoundingClientRect();
+        if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+          this.hoverWorld = getWorldPos(e.clientX, e.clientY);
+        }
+      }
+    });
+
     window.addEventListener('pointerup', (e) => {
       if (this.draggingSlot == null) return;
       const slot = this.draggingSlot;
       this.draggingSlot = null;
       const rect = this.canvas.getBoundingClientRect();
-      if (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      ) {
+      if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
         const world = getWorldPos(e.clientX, e.clientY);
-        const res = this.sim.deployCard(slot, world.x, world.y);
+        const res = this.sim.deployCard(slot, world.x, world.z);
         if (res.ok) {
           this.selectedSlot = null;
           this._syncHandUI(true);
@@ -238,9 +341,33 @@ export class BattleController {
         }
       }
     });
+
+    // Minimap scrub click & drag
+    if (this.minimapCanvas) {
+      let scrubbing = false;
+      const jumpFromMinimap = (e) => {
+        const rect = this.minimapCanvas.getBoundingClientRect();
+        const t = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+        const zTarget = -6 + t * 92; // Map vertical range -6..86
+        this.renderer.setFocusZ(zTarget);
+      };
+      this.minimapCanvas.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        scrubbing = true;
+        this.minimapCanvas.setPointerCapture?.(e.pointerId);
+        jumpFromMinimap(e);
+      });
+      this.minimapCanvas.addEventListener('pointermove', (e) => {
+        if (scrubbing) jumpFromMinimap(e);
+      });
+      window.addEventListener('pointerup', () => {
+        scrubbing = false;
+      });
+    }
   }
 
   _handleKeyDown(e) {
+    this._keysHeld.add(e.code);
     if (e.key >= '1' && e.key <= '4') {
       const idx = Number(e.key) - 1;
       this.selectedSlot = this.selectedSlot === idx ? null : idx;
@@ -251,14 +378,24 @@ export class BattleController {
     } else if (e.key === ' ') {
       e.preventDefault();
       this.paused = !this.paused;
-      const btn = this.root.querySelector('#wr-pause-btn');
-      if (btn) btn.textContent = this.paused ? '▶ 继续' : '⏸ 暂停';
+      const img = this.root.querySelector('#wr-pause-btn img');
+      if (img) {
+        img.src = this.paused ? './r/hud/CombatHUD_Tex_IconPlay.webp' : './r/hud/CombatHUD_Tex_IconPause.webp';
+      }
     }
   }
 
   _loop(now) {
     const dtReal = Math.min(0.1, (now - this.lastFrameMs) / 1000);
     this.lastFrameMs = now;
+
+    // Keyboard smooth camera pan
+    if (this._keysHeld.has('KeyW') || this._keysHeld.has('ArrowUp')) {
+      this.renderer.panByDeltaZ(42 * dtReal);
+    }
+    if (this._keysHeld.has('KeyS') || this._keysHeld.has('ArrowDown')) {
+      this.renderer.panByDeltaZ(-42 * dtReal);
+    }
 
     if (!this.paused && !this.sim.finished) {
       this.accumSec += dtReal * this.speedMult;
@@ -271,7 +408,6 @@ export class BattleController {
       }
     }
 
-    // Flush audio queue
     while (this.sim.audioQueue.length > 0) {
       sfx.play(this.sim.audioQueue.shift());
     }
@@ -281,6 +417,8 @@ export class BattleController {
       hoverWorld: this.hoverWorld,
     });
 
+    this._syncWorldOverlays();
+    this._drawMinimap();
     this._syncHudUI();
     this._syncHandUI(false);
 
@@ -292,6 +430,149 @@ export class BattleController {
     }
 
     this.rafId = requestAnimationFrame((t) => this._loop(t));
+  }
+
+  _syncWorldOverlays() {
+    if (!this.overlaysEl) return;
+
+    const liveHpKeys = new Set();
+
+    // Structures & damaged/important units get crisp projected HUD health bars
+    const trackEntityBar = (key, worldX, worldY, worldZ, hp, maxHp, team, options = {}) => {
+      const proj = this.renderer.projectWorldToScreen(worldX, worldY, worldZ);
+      if (!proj.visible) return;
+      liveHpKeys.add(key);
+
+      let el = this._hpOverlayPool.get(key);
+      if (!el) {
+        el = document.createElement('div');
+        el.className = `wr-world-hp ${team} ${options.isStruct ? 'struct' : ''}`;
+        el.innerHTML = `<div class="bar"><div class="fill"></div></div>`;
+        this.overlaysEl.appendChild(el);
+        this._hpOverlayPool.set(key, el);
+      }
+      const pct = Math.max(0, Math.min(100, (hp / Math.max(1, maxHp)) * 100));
+      el.querySelector('.fill').style.width = `${pct.toFixed(1)}%`;
+      el.style.transform = `translate3d(${proj.x.toFixed(1)}px, ${proj.y.toFixed(1)}px, 0) translate(-50%, -100%)`;
+    };
+
+    for (const s of this.sim.structures || []) {
+      if (s.hp > 0 && !s.rebuilding) {
+        trackEntityBar(s.id, s.x, s.kind === 'base' ? 6.2 : 5.4, s.z, s.hp + (s.ragnarosShield || 0), s.maxHp + (s.ragnarosMaxShield || 0), s.team, { isStruct: true });
+      }
+    }
+    for (const c of this.sim.chests || []) {
+      if (c.alive && c.hp < c.maxHp) {
+        trackEntityBar(c.id, c.x, 3.0, c.z, c.hp, c.maxHp, 'neutral');
+      }
+    }
+    for (const u of this.sim.units || []) {
+      if (!u.alive || u.attachedStructureId) continue;
+      if (u.hp < u.maxHp || u.spec?.isLeader || u.slug === 'onyxia-warder' || u.isEgg) {
+        const yOff = (u.isFlying ? 6.0 : 3.2) * (u.weight === 'heavy' ? 1.15 : 1.0);
+        trackEntityBar(u.id, u.x, yOff, u.z, u.hp, u.maxHp, u.team);
+      }
+    }
+
+    for (const [k, el] of this._hpOverlayPool.entries()) {
+      if (!liveHpKeys.has(k)) {
+        el.remove();
+        this._hpOverlayPool.delete(k);
+      }
+    }
+
+    // Floating combat texts (gold / phase damage / crits)
+    const liveTxtKeys = new Set();
+    for (const ft of this.sim.floatingTexts || []) {
+      liveTxtKeys.add(ft.id);
+      const t = Math.min(1, ft.age / ft.duration);
+      const proj = this.renderer.projectWorldToScreen(ft.x, 3.5 + t * 2.4, ft.z);
+      if (!proj.visible) continue;
+
+      let el = this._textOverlayPool.get(ft.id);
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'wr-float-dmg';
+        el.textContent = ft.text;
+        el.style.color = ft.color || '#fde047';
+        this.overlaysEl.appendChild(el);
+        this._textOverlayPool.set(ft.id, el);
+      }
+      el.style.opacity = String((1 - t * t).toFixed(2));
+      el.style.transform = `translate3d(${proj.x.toFixed(1)}px, ${proj.y.toFixed(1)}px, 0) translate(-50%, -50%)`;
+    }
+
+    for (const [k, el] of this._textOverlayPool.entries()) {
+      if (!liveTxtKeys.has(k)) {
+        el.remove();
+        this._textOverlayPool.delete(k);
+      }
+    }
+  }
+
+  _drawMinimap() {
+    const cvs = this.minimapCanvas;
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    const w = cvs.width;
+    const h = cvs.height;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(18, 13, 18, 0.88)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Map arena x: [-28..+28], z: [-10..+88]
+    const toMX = (x) => ((x + 28) / 56) * w;
+    const toMY = (z) => h - ((z + 10) / 98) * h;
+
+    // Lava obstacles
+    ctx.fillStyle = 'rgba(234, 88, 12, 0.45)';
+    for (const obs of UNWALKABLE_OBSTACLES) {
+      ctx.beginPath();
+      ctx.ellipse(toMX(obs.cx), toMY(obs.cz), (obs.rx / 56) * w, (obs.rz / 98) * h, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Mines
+    ctx.fillStyle = '#facc15';
+    for (const m of this.sim.mines || []) {
+      if (m.gold > 0) {
+        ctx.fillRect(toMX(m.x) - 2, toMY(m.z) - 2, 4, 4);
+      }
+    }
+
+    // Structures
+    for (const s of this.sim.structures || []) {
+      if (s.hp <= 0 && !s.rebuilding) continue;
+      ctx.fillStyle = s.team === 'player' ? '#38bdf8' : '#ef4444';
+      const r = s.kind === 'base' ? 4.5 : 3.2;
+      ctx.beginPath();
+      ctx.arc(toMX(s.x), toMY(s.z), r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Units
+    for (const u of this.sim.units || []) {
+      if (!u.alive) continue;
+      ctx.fillStyle = u.team === 'player' ? '#7dd3fc' : '#fca5a5';
+      ctx.fillRect(toMX(u.x) - 1.5, toMY(u.z) - 1.5, 3, 3);
+    }
+
+    // Onyxia
+    if (this.sim.boss?.alive) {
+      ctx.fillStyle = '#f97316';
+      ctx.beginPath();
+      ctx.arc(toMX(ONYXIA_POS.x), toMY(ONYXIA_POS.z), 5.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Camera viewport box around focusZ
+    const fz = this.renderer.getFocusZ();
+    const viewTopY = toMY(fz + 21);
+    const viewBotY = toMY(fz - 16);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(2, Math.max(1, viewTopY), w - 4, Math.max(16, viewBotY - viewTopY));
   }
 
   _syncHudUI() {
@@ -308,10 +589,8 @@ export class BattleController {
       moodImg.src = desiredMood;
     }
 
-    const titleEl = this.root.querySelector('#wr-boss-title');
-    if (titleEl) {
-      titleEl.innerHTML = `<strong>奥妮克希亚</strong> · P${snap.bossPhase} (${esc(this.difficulty.nameZh)})`;
-    }
+    const pBadge = this.root.querySelector('#wr-boss-phase-badge');
+    if (pBadge) pBadge.textContent = `P${snap.bossPhase}`;
 
     const hpText = this.root.querySelector('#wr-boss-hp-text');
     if (hpText) {
@@ -330,20 +609,15 @@ export class BattleController {
 
     const eggEl = this.root.querySelector('#wr-egg-timer');
     if (eggEl) {
-      eggEl.textContent = snap.nextEggSec != null ? `下波龙蛋 ${formatClock(snap.nextEggSec)}` : '龙蛋波次已结束';
+      eggEl.textContent = snap.nextEggSec != null ? `龙蛋 ${formatClock(snap.nextEggSec)}` : '龙蛋已结束';
     }
 
     const traitsEl = this.root.querySelector('#wr-boss-traits');
     if (traitsEl) {
-      const t = [];
-      if (snap.bossResistant) t.push('抗性');
-      if (snap.bossArmored) t.push('护甲');
-      if (t.length) {
-        traitsEl.style.display = '';
-        traitsEl.textContent = t.join(' + ');
-      } else {
-        traitsEl.style.display = 'none';
-      }
+      let html = '';
+      if (snap.bossResistant) html += `<img src="./r/hud/UnitOwnership_MagicFrame.webp" title="元素抗性" alt="抗性" />`;
+      if (snap.bossArmored) html += `<img src="./r/hud/UnitOwnership_ArmorFrame.webp" title="物理护甲" alt="护甲" />`;
+      traitsEl.innerHTML = html;
     }
 
     const bannerEl = this.root.querySelector('#wr-battle-banner');
@@ -356,7 +630,24 @@ export class BattleController {
       }
     }
 
-    // Gold meter
+    const tauntEl = this.root.querySelector('#wr-boss-taunt');
+    if (tauntEl) {
+      if (snap.bossTaunt?.timer > 0 && snap.bossTaunt.text) {
+        tauntEl.style.display = '';
+        tauntEl.textContent = `“${snap.bossTaunt.text}”`;
+      } else {
+        tauntEl.style.display = 'none';
+      }
+    }
+
+    // Offscreen Keep threat check
+    const warnEl = this.root.querySelector('#wr-offscreen-warn');
+    if (warnEl) {
+      const fz = this.renderer.getFocusZ();
+      const nearBase = this.sim.units.some((u) => u.alive && u.team === 'enemy' && !u.isEgg && u.z < 20);
+      warnEl.style.display = nearBase && fz > 32 ? '' : 'none';
+    }
+
     const goldVal = this.root.querySelector('#wr-gold-val');
     if (goldVal) goldVal.textContent = String(Math.floor(snap.playerGold));
 
@@ -380,9 +671,9 @@ export class BattleController {
           const affordable = this.sim.playerGold >= spec.cost;
           const selected = this.selectedSlot === idx;
           return `
-            <button type="button" class="wr-hand-card ${selected ? 'selected' : ''} ${affordable ? '' : 'unaffordable'}" data-hand-slot="${idx}">
-              <div class="wr-cost-badge">${spec.cost}</div>
-              <img src="${esc(normalizeAssetPath(spec.sprite))}" alt="${esc(spec.nameZh)}" />
+            <button type="button" class="wr-hand-card-3d ${selected ? 'selected' : ''} ${affordable ? '' : 'unaffordable'}" data-hand-slot="${idx}">
+              <div class="wr-hud-cost">${spec.cost}</div>
+              <img class="wr-hud-mini-spr" src="${esc(normalizeAssetPath(spec.sprite))}" alt="${esc(spec.nameZh)}" />
               <span class="nm">${esc(spec.nameZh)}</span>
               <span class="key-hint">${idx + 1}</span>
             </button>
@@ -396,15 +687,16 @@ export class BattleController {
 
       handRow.innerHTML = `
         ${cardsHtml}
-        <div class="wr-next-card">
-          <span>下一张</span>
+        <div class="wr-next-card-3d">
+          <span class="lbl">下张</span>
           ${nextSpec ? `<img src="${esc(normalizeAssetPath(nextSpec.sprite))}" alt="${esc(nextSpec.nameZh)}" /><span>${nextSpec.cost}金</span>` : ''}
         </div>
       `;
 
       handRow.querySelectorAll('[data-hand-slot]').forEach((btn) => {
         const idx = Number(btn.dataset.handSlot);
-        btn.addEventListener('pointerdown', () => {
+        btn.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
           this.draggingSlot = idx;
           this.selectedSlot = idx;
           this._syncHandUI(true);
@@ -414,7 +706,6 @@ export class BattleController {
         });
       });
     } else {
-      // Lightweight affordability toggle without re-rendering DOM
       handRow.querySelectorAll('[data-hand-slot]').forEach((btn) => {
         const idx = Number(btn.dataset.handSlot);
         const spec = this.sim.getHandCardSpec(idx);
@@ -436,10 +727,10 @@ export class BattleController {
         <div style="text-align:center;margin-bottom:12px;">
           <img src="${snap.victory ? './r/onyxia/Onyxia_Angry.webp' : './r/onyxia/Onyxia_Smug.webp'}" alt="" style="width:72px;height:72px;border-radius:12px;border:2px solid ${snap.victory ? '#22c55e' : '#ef4444'};margin:0 auto 8px;" />
           <h2 style="margin:0;font-family:var(--font-display);color:${snap.victory ? '#4ade80' : '#f87171'};">
-            ${snap.victory ? '🎉 胜利！奥妮克希亚已被击败！' : '💀 挑战失败'}
+            ${snap.victory ? '胜利！奥妮克希亚已被击败' : '挑战失败'}
           </h2>
           <p style="margin:4px 0 0;font-size:13px;color:#d6cfc6;">
-            ${snap.victory ? `通关用时 ${formatClock(snap.elapsedTime)} · 达成全阶段击杀` : `${esc(snap.defeatReason || '防线失守')} · Boss剩余血量 ${snap.bossHpPct.toFixed(1)}% (P${snap.bossPhase})`}
+            ${snap.victory ? `通关用时 ${formatClock(snap.elapsedTime)} · 全阶段击杀` : `${esc(snap.defeatReason || '防线失守')} · Boss剩余血量 ${snap.bossHpPct.toFixed(1)}% (P${snap.bossPhase})`}
           </p>
         </div>
 
