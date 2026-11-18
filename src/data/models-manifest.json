@@ -26,64 +26,64 @@
     },
     "player-keep": {
       "glb": "./r/3d/poi/player-keep.glb",
-      "bytes": 304904,
+      "bytes": 273032,
       "bbox": {
         "min": [
-          -4.497,
-          -2.492,
-          -3.868
+          -2.96,
+          -2.233,
+          -3.547
         ],
         "max": [
-          4.497,
-          4.844,
-          3.868
+          2.955,
+          8.575,
+          3.547
         ],
         "size": [
-          8.994,
-          7.335,
-          7.736
+          5.915,
+          10.808,
+          7.094
         ]
       }
     },
     "tower-player": {
       "glb": "./r/3d/poi/tower-player.glb",
-      "bytes": 498900,
+      "bytes": 178392,
       "bbox": {
         "min": [
-          -2.161,
-          0.191,
-          -2.539
+          -2.96,
+          0.441,
+          -2.109
         ],
         "max": [
-          2.161,
-          4.385,
-          2.315
+          2.955,
+          8.575,
+          2.166
         ],
         "size": [
-          4.321,
-          4.194,
-          4.854
+          5.915,
+          8.134,
+          4.275
         ]
       }
     },
     "tower-enemy": {
       "glb": "./r/3d/poi/tower-enemy.glb",
-      "bytes": 657932,
+      "bytes": 176040,
       "bbox": {
         "min": [
-          -2.261,
-          -0.051,
-          -2.711
+          -2.96,
+          0.441,
+          -2.109
         ],
         "max": [
-          2.373,
-          4.77,
-          2.371
+          2.955,
+          8.575,
+          2.166
         ],
         "size": [
-          4.634,
-          4.821,
-          5.083
+          5.915,
+          8.134,
+          4.275
         ]
       }
     },
@@ -126,6 +126,27 @@
           2.751,
           2.358,
           2.699
+        ]
+      }
+    },
+    "chest-hatch": {
+      "glb": "./r/3d/poi/chest-hatch.glb",
+      "bytes": 39176,
+      "bbox": {
+        "min": [
+          -1.387,
+          0.0,
+          -1.491
+        ],
+        "max": [
+          1.387,
+          0.143,
+          1.491
+        ],
+        "size": [
+          2.773,
+          0.143,
+          2.983
         ]
       }
     },
@@ -311,488 +332,488 @@
     "abomination": {
       "glb": "./r/3d/minis/abomination.glb",
       "pedestal": "undead",
-      "height": 4.64,
-      "bytes": 256440
+      "height": 2.69,
+      "bytes": 237092
     },
     "ancient-of-war": {
       "glb": "./r/3d/minis/ancient-of-war.glb",
       "pedestal": "cenarion",
-      "height": 7.46,
-      "bytes": 318524
+      "height": 3.4,
+      "bytes": 315780
     },
     "angry-chickens": {
       "glb": "./r/3d/minis/angry-chickens.glb",
       "pedestal": "beast",
-      "height": 1.01,
-      "bytes": 339952
+      "height": 3.37,
+      "bytes": 83360
     },
     "anub-arak": {
       "glb": "./r/3d/minis/anub-arak.glb",
       "pedestal": "beast",
-      "height": 5.21,
-      "bytes": 378908
+      "height": 2.81,
+      "bytes": 295012
     },
     "arthas": {
       "glb": "./r/3d/minis/arthas.glb",
       "pedestal": "alliance",
-      "height": 4.64,
-      "bytes": 334208
+      "height": 3.4,
+      "bytes": 287908
     },
     "banshee": {
       "glb": "./r/3d/minis/banshee.glb",
       "pedestal": "undead",
-      "height": 3.34,
-      "bytes": 435680
+      "height": 3.4,
+      "bytes": 437268
     },
     "baron-rivendare": {
       "glb": "./r/3d/minis/baron-rivendare.glb",
       "pedestal": "undead",
-      "height": 7.69,
-      "bytes": 629052
+      "height": 3.14,
+      "bytes": 640784
     },
     "bat-rider": {
       "glb": "./r/3d/minis/bat-rider.glb",
       "pedestal": "horde",
-      "height": 4.56,
-      "bytes": 298968
+      "height": 2.29,
+      "bytes": 295372
     },
     "bloodmage-thalnos": {
       "glb": "./r/3d/minis/bloodmage-thalnos.glb",
       "pedestal": "undead",
-      "height": 6.56,
-      "bytes": 1304516
+      "height": 3.4,
+      "bytes": 278316
     },
     "bog-beast": {
       "glb": "./r/3d/minis/bog-beast.glb",
       "pedestal": "cenarion",
-      "height": 3.64,
-      "bytes": 295380
+      "height": 3.4,
+      "bytes": 328260
     },
     "cairne-bloodhoof": {
       "glb": "./r/3d/minis/cairne-bloodhoof.glb",
       "pedestal": "horde",
-      "height": 5.96,
-      "bytes": 275208
+      "height": 3.4,
+      "bytes": 259960
     },
     "cenarius": {
       "glb": "./r/3d/minis/cenarius.glb",
       "pedestal": "cenarion",
-      "height": 5.86,
-      "bytes": 343140
+      "height": 3.4,
+      "bytes": 326520
     },
     "charlga-razorflank": {
       "glb": "./r/3d/minis/charlga-razorflank.glb",
       "pedestal": "beast",
-      "height": 3.23,
-      "bytes": 234968
+      "height": 3.4,
+      "bytes": 224100
     },
     "chimaera": {
       "glb": "./r/3d/minis/chimaera.glb",
       "pedestal": "beast",
-      "height": 3.41,
-      "bytes": 491068
+      "height": 1.54,
+      "bytes": 480280
     },
     "core-hounds": {
       "glb": "./r/3d/minis/core-hounds.glb",
       "pedestal": "blackrock",
-      "height": 6.08,
-      "bytes": 590168
+      "height": 1.77,
+      "bytes": 238972
     },
     "dark-iron-miner": {
       "glb": "./r/3d/minis/dark-iron-miner.glb",
       "pedestal": "blackrock",
-      "height": 6.94,
-      "bytes": 265452
+      "height": 3.4,
+      "bytes": 177340
     },
     "darkspear-troll": {
       "glb": "./r/3d/minis/darkspear-troll.glb",
       "pedestal": "horde",
-      "height": 4.8,
-      "bytes": 207692
+      "height": 3.4,
+      "bytes": 190972
     },
     "defias-bandits": {
       "glb": "./r/3d/minis/defias-bandits.glb",
       "pedestal": "alliance",
-      "height": 2.58,
-      "bytes": 281916
+      "height": 3.4,
+      "bytes": 197164
     },
     "dire-batlings": {
       "glb": "./r/3d/minis/dire-batlings.glb",
       "pedestal": "undead",
-      "height": 0.32,
-      "bytes": 62956
+      "height": 0.63,
+      "bytes": 64164
     },
     "drake": {
       "glb": "./r/3d/minis/drake.glb",
       "pedestal": "blackrock",
-      "height": 5.3,
-      "bytes": 651884
+      "height": 2.06,
+      "bytes": 230908
     },
     "druid-of-the-claw": {
       "glb": "./r/3d/minis/druid-of-the-claw.glb",
       "pedestal": "cenarion",
-      "height": 4.32,
-      "bytes": 1047176
+      "height": 3.4,
+      "bytes": 347396
     },
     "dryad": {
       "glb": "./r/3d/minis/dryad.glb",
       "pedestal": "cenarion",
-      "height": 5.83,
-      "bytes": 300444
+      "height": 3.4,
+      "bytes": 284644
     },
     "earth-elemental": {
       "glb": "./r/3d/minis/earth-elemental.glb",
       "pedestal": "blackrock",
-      "height": 3.12,
-      "bytes": 159968
+      "height": 2.34,
+      "bytes": 160156
     },
     "emperor-thaurissan": {
       "glb": "./r/3d/minis/emperor-thaurissan.glb",
       "pedestal": "blackrock",
-      "height": 3.35,
-      "bytes": 291088
+      "height": 3.4,
+      "bytes": 310640
     },
     "faerie-dragon": {
       "glb": "./r/3d/minis/faerie-dragon.glb",
       "pedestal": "cenarion",
-      "height": 2.7,
-      "bytes": 236808
+      "height": 1.55,
+      "bytes": 239300
     },
     "fire-elemental": {
       "glb": "./r/3d/minis/fire-elemental.glb",
       "pedestal": "blackrock",
-      "height": 4.64,
-      "bytes": 457360
+      "height": 3.04,
+      "bytes": 134860
     },
     "firehammer": {
       "glb": "./r/3d/minis/firehammer.glb",
       "pedestal": "blackrock",
-      "height": 3.1,
-      "bytes": 256536
+      "height": 3.4,
+      "bytes": 215392
     },
     "flamewaker": {
       "glb": "./r/3d/minis/flamewaker.glb",
       "pedestal": "blackrock",
-      "height": 5.03,
-      "bytes": 190244
+      "height": 3.4,
+      "bytes": 171400
     },
     "footmen": {
       "glb": "./r/3d/minis/footmen.glb",
       "pedestal": "alliance",
-      "height": 3.14,
-      "bytes": 189240
+      "height": 3.23,
+      "bytes": 191424
     },
     "frostwolf-shaman": {
       "glb": "./r/3d/minis/frostwolf-shaman.glb",
       "pedestal": "horde",
-      "height": 3.24,
-      "bytes": 239688
+      "height": 3.4,
+      "bytes": 241460
     },
     "gargoyle": {
       "glb": "./r/3d/minis/gargoyle.glb",
       "pedestal": "undead",
-      "height": 3.38,
-      "bytes": 238344
+      "height": 1.83,
+      "bytes": 240088
     },
     "general-drakkisath": {
       "glb": "./r/3d/minis/general-drakkisath.glb",
       "pedestal": "blackrock",
-      "height": 8.16,
-      "bytes": 349560
+      "height": 2.96,
+      "bytes": 254408
     },
     "ghoul": {
       "glb": "./r/3d/minis/ghoul.glb",
       "pedestal": "undead",
-      "height": 2.76,
-      "bytes": 263036
+      "height": 3.4,
+      "bytes": 264872
     },
     "gnoll-brute": {
       "glb": "./r/3d/minis/gnoll-brute.glb",
       "pedestal": "beast",
-      "height": 3.94,
-      "bytes": 240212
+      "height": 3.22,
+      "bytes": 207828
     },
     "goblin-sapper": {
       "glb": "./r/3d/minis/goblin-sapper.glb",
       "pedestal": "horde",
-      "height": 4.87,
-      "bytes": 307760
+      "height": 3.4,
+      "bytes": 270288
     },
     "grommash-hellscream": {
       "glb": "./r/3d/minis/grommash-hellscream.glb",
       "pedestal": "horde",
-      "height": 4.33,
-      "bytes": 375240
+      "height": 3.4,
+      "bytes": 302940
     },
     "gryphon-rider": {
       "glb": "./r/3d/minis/gryphon-rider.glb",
       "pedestal": "alliance",
-      "height": 114.36,
-      "bytes": 400736
+      "height": 1.5,
+      "bytes": 391388
     },
     "harpies": {
       "glb": "./r/3d/minis/harpies.glb",
       "pedestal": "beast",
-      "height": 3.16,
-      "bytes": 246208
+      "height": 3.4,
+      "bytes": 248004
     },
     "harvest-golem": {
       "glb": "./r/3d/minis/harvest-golem.glb",
       "pedestal": "alliance",
-      "height": 3.84,
-      "bytes": 205816
+      "height": 3.4,
+      "bytes": 207532
     },
     "headless-horseman": {
       "glb": "./r/3d/minis/headless-horseman.glb",
       "pedestal": "undead",
-      "height": 7.21,
-      "bytes": 424320
+      "height": 2.57,
+      "bytes": 423604
     },
     "hogger": {
       "glb": "./r/3d/minis/hogger.glb",
       "pedestal": "beast",
-      "height": 4.42,
-      "bytes": 551112
+      "height": 3.4,
+      "bytes": 297852
     },
     "huntress": {
       "glb": "./r/3d/minis/huntress.glb",
       "pedestal": "alliance",
-      "height": 3.5,
-      "bytes": 349272
+      "height": 2.06,
+      "bytes": 345944
     },
     "jaina-proudmoore": {
       "glb": "./r/3d/minis/jaina-proudmoore.glb",
       "pedestal": "alliance",
-      "height": 3.81,
-      "bytes": 328920
+      "height": 3.4,
+      "bytes": 311560
     },
     "maiev-shadowsong": {
       "glb": "./r/3d/minis/maiev-shadowsong.glb",
       "pedestal": "alliance",
-      "height": 5.37,
-      "bytes": 332412
+      "height": 3.4,
+      "bytes": 310152
     },
     "malfurion": {
       "glb": "./r/3d/minis/malfurion.glb",
       "pedestal": "alliance",
-      "height": 4.39,
-      "bytes": 350668
+      "height": 3.4,
+      "bytes": 337724
     },
     "meat-wagon": {
       "glb": "./r/3d/minis/meat-wagon.glb",
       "pedestal": "undead",
-      "height": 5.21,
-      "bytes": 432320
+      "height": 2.85,
+      "bytes": 173596
     },
     "molten-giant": {
       "glb": "./r/3d/minis/molten-giant.glb",
       "pedestal": "blackrock",
-      "height": 4.4,
-      "bytes": 175612
+      "height": 2.65,
+      "bytes": 177328
     },
     "moonkin": {
       "glb": "./r/3d/minis/moonkin.glb",
       "pedestal": "cenarion",
-      "height": 5.17,
-      "bytes": 281676
+      "height": 2.49,
+      "bytes": 271292
     },
     "mountaineer": {
       "glb": "./r/3d/minis/mountaineer.glb",
       "pedestal": "alliance",
-      "height": 3.7,
-      "bytes": 365204
+      "height": 2.51,
+      "bytes": 349248
     },
     "murloc-tidehunters": {
       "glb": "./r/3d/minis/murloc-tidehunters.glb",
       "pedestal": "beast",
-      "height": 2.86,
-      "bytes": 170416
+      "height": 3.4,
+      "bytes": 166692
     },
     "necromancer": {
       "glb": "./r/3d/minis/necromancer.glb",
       "pedestal": "undead",
-      "height": 3.44,
-      "bytes": 241660
+      "height": 2.77,
+      "bytes": 221492
     },
     "ogre-mage": {
       "glb": "./r/3d/minis/ogre-mage.glb",
       "pedestal": "horde",
-      "height": 3.55,
-      "bytes": 198596
+      "height": 3.02,
+      "bytes": 200312
     },
     "old-murk-eye": {
       "glb": "./r/3d/minis/old-murk-eye.glb",
       "pedestal": "beast",
-      "height": 2.84,
-      "bytes": 345668
+      "height": 3.4,
+      "bytes": 220996
     },
     "onu": {
       "glb": "./r/3d/minis/onu.glb",
       "pedestal": "cenarion",
-      "height": 9.34,
-      "bytes": 347784
+      "height": 3.4,
+      "bytes": 347480
     },
     "orgrim-doomhammer": {
       "glb": "./r/3d/minis/orgrim-doomhammer.glb",
       "pedestal": "blackrock",
-      "height": 3.43,
-      "bytes": 522908
+      "height": 3.4,
+      "bytes": 277568
     },
     "plague-farmer": {
       "glb": "./r/3d/minis/plague-farmer.glb",
       "pedestal": "undead",
-      "height": 2.96,
-      "bytes": 284684
+      "height": 3.4,
+      "bytes": 271328
     },
     "priestess": {
       "glb": "./r/3d/minis/priestess.glb",
       "pedestal": "alliance",
-      "height": 2.89,
-      "bytes": 209912
+      "height": 3.4,
+      "bytes": 231684
     },
     "prowler": {
       "glb": "./r/3d/minis/prowler.glb",
       "pedestal": "beast",
-      "height": 6.56,
-      "bytes": 1303308
+      "height": 1.67,
+      "bytes": 149128
     },
     "pyromancer": {
       "glb": "./r/3d/minis/pyromancer.glb",
       "pedestal": "blackrock",
-      "height": 3.07,
-      "bytes": 343700
+      "height": 3.4,
+      "bytes": 345232
     },
     "quilboar": {
       "glb": "./r/3d/minis/quilboar.glb",
       "pedestal": "beast",
-      "height": 3.52,
-      "bytes": 216132
+      "height": 3.4,
+      "bytes": 210860
     },
     "ragnaros": {
       "glb": "./r/3d/minis/ragnaros.glb",
       "pedestal": "blackrock",
-      "height": 9.11,
-      "bytes": 410664
+      "height": 3.4,
+      "bytes": 358000
     },
     "raptors": {
       "glb": "./r/3d/minis/raptors.glb",
       "pedestal": "beast",
-      "height": 2.65,
-      "bytes": 189668
+      "height": 2.12,
+      "bytes": 188864
     },
     "rend-blackhand": {
       "glb": "./r/3d/minis/rend-blackhand.glb",
       "pedestal": "blackrock",
-      "height": 4.56,
-      "bytes": 449548
+      "height": 1.78,
+      "bytes": 468508
     },
     "s-a-f-e-pilot": {
       "glb": "./r/3d/minis/s-a-f-e-pilot.glb",
       "pedestal": "alliance",
-      "height": 3.35,
-      "bytes": 380884
+      "height": 2.35,
+      "bytes": 356424
     },
     "skeleton-party": {
       "glb": "./r/3d/minis/skeleton-party.glb",
       "pedestal": "undead",
-      "height": 2.93,
-      "bytes": 240392
+      "height": 3.4,
+      "bytes": 236328
     },
     "skeletons": {
       "glb": "./r/3d/minis/skeletons.glb",
       "pedestal": "undead",
-      "height": 2.55,
-      "bytes": 280320
+      "height": 3.4,
+      "bytes": 223728
     },
     "sneed": {
       "glb": "./r/3d/minis/sneed.glb",
       "pedestal": "horde",
-      "height": 4.84,
-      "bytes": 318280
+      "height": 3.4,
+      "bytes": 325984
     },
     "spiderlings": {
       "glb": "./r/3d/minis/spiderlings.glb",
       "pedestal": "beast",
-      "height": 2.63,
-      "bytes": 31176
+      "height": 1.85,
+      "bytes": 140608
     },
     "stonehoof-tauren": {
       "glb": "./r/3d/minis/stonehoof-tauren.glb",
       "pedestal": "horde",
-      "height": 5.16,
-      "bytes": 266580
+      "height": 3.4,
+      "bytes": 240552
     },
     "swole-troll": {
       "glb": "./r/3d/minis/swole-troll.glb",
       "pedestal": "horde",
-      "height": 5.09,
-      "bytes": 254732
+      "height": 2.5,
+      "bytes": 240628
     },
     "sylvanas-windrunner": {
       "glb": "./r/3d/minis/sylvanas-windrunner.glb",
       "pedestal": "horde",
-      "height": 7.7,
-      "bytes": 470340
+      "height": 3.4,
+      "bytes": 313236
     },
     "thrall": {
       "glb": "./r/3d/minis/thrall.glb",
       "pedestal": "horde",
-      "height": 4.38,
-      "bytes": 335948
+      "height": 3.25,
+      "bytes": 304984
     },
     "tirion-fordring": {
       "glb": "./r/3d/minis/tirion-fordring.glb",
       "pedestal": "alliance",
-      "height": 3.12,
-      "bytes": 262636
+      "height": 3.4,
+      "bytes": 251628
     },
     "treant": {
       "glb": "./r/3d/minis/treant.glb",
       "pedestal": "cenarion",
-      "height": 2.77,
-      "bytes": 141828
+      "height": 3.34,
+      "bytes": 143544
     },
     "vultures": {
       "glb": "./r/3d/minis/vultures.glb",
       "pedestal": "beast",
-      "height": 2.38,
-      "bytes": 161040
+      "height": 1.1,
+      "bytes": 128332
     },
     "warsong-grunts": {
       "glb": "./r/3d/minis/warsong-grunts.glb",
       "pedestal": "horde",
-      "height": 3.2,
-      "bytes": 206664
+      "height": 3.23,
+      "bytes": 199008
     },
     "warsong-raider": {
       "glb": "./r/3d/minis/warsong-raider.glb",
       "pedestal": "horde",
-      "height": 3.4,
-      "bytes": 422640
+      "height": 2.82,
+      "bytes": 429540
     },
     "whelp-eggs": {
       "glb": "./r/3d/minis/whelp-eggs.glb",
       "pedestal": "blackrock",
-      "height": 1.77,
-      "bytes": 342504
+      "height": 3.4,
+      "bytes": 371500
     },
     "witch-doctor": {
       "glb": "./r/3d/minis/witch-doctor.glb",
       "pedestal": "horde",
-      "height": 4.28,
-      "bytes": 314896
+      "height": 3.4,
+      "bytes": 274420
     },
     "worgen": {
       "glb": "./r/3d/minis/worgen.glb",
       "pedestal": "alliance",
-      "height": 6.56,
-      "bytes": 1304484
+      "height": 3.21,
+      "bytes": 224000
     },
     "ysera": {
       "glb": "./r/3d/minis/ysera.glb",
       "pedestal": "cenarion",
-      "height": 21.08,
-      "bytes": 697304
+      "height": 1.25,
+      "bytes": 699372
     },
     "kobold-miner": {
       "glb": "./r/3d/poi/kobold-miner.glb",

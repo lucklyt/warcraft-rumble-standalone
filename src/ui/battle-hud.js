@@ -58,6 +58,7 @@ export class BattleController {
     this._dragState = null;
     this._canvasGesture = null;
     this._panning = false;
+    this._autoStartTimer = null;
     this._keysHeld = new Set();
     this._minimapOpen = false;
 
@@ -259,9 +260,17 @@ export class BattleController {
 
     this.lastFrameMs = performance.now();
     this.rafId = requestAnimationFrame((now) => this._loop(now));
+    this._autoStartTimer = setTimeout(() => {
+      if (!this.disposed && !this.matchStarted) this.startBattle();
+    }, 900);
   }
 
   destroy() {
+    this.disposed = true;
+    if (this._autoStartTimer) {
+      clearTimeout(this._autoStartTimer);
+      this._autoStartTimer = null;
+    }
     if (this.rafId) cancelAnimationFrame(this.rafId);
     window.removeEventListener('keydown', this._onKeyDown);
     window.removeEventListener('keyup', this._onKeyUp);
@@ -275,6 +284,10 @@ export class BattleController {
 
   startBattle() {
     if (this.matchStarted) return;
+    if (this._autoStartTimer) {
+      clearTimeout(this._autoStartTimer);
+      this._autoStartTimer = null;
+    }
     sfx.play('start');
     const capImg = this.root.querySelector('#wr-start-cap-img');
     if (capImg) capImg.src = './r/hud/CombatHUD_Tex_StartButton_ButtonPress.webp';
@@ -313,23 +326,47 @@ export class BattleController {
     return this.renderer.screenToWorld(clientX - rect.left, clientY - rect.top);
   }
 
+  _showGhostAt(slotIdx, clientX, clientY) {
+    const ghost = this.root.querySelector('#wr-drag-ghost');
+    if (!ghost) return;
+    const spec = slotIdx != null ? this.sim.getHandCardSpec(slotIdx) : null;
+    if (!spec) {
+      ghost.style.display = 'none';
+      return;
+    }
+    const img = ghost.querySelector('img');
+    const lbl = ghost.querySelector('#wr-drag-ghost-label');
+    const wantedSrc = normalizeAssetPath(spec.sprite);
+    if (img && img.getAttribute('src') !== wantedSrc) img.setAttribute('src', wantedSrc);
+    if (lbl) lbl.textContent = `${spec.nameZh} (${spec.cost}金)`;
+    ghost.style.display = '';
+    ghost.style.left = `${clientX}px`;
+    ghost.style.top = `${clientY}px`;
+  }
+
+  _hideGhost() {
+    const ghost = this.root.querySelector('#wr-drag-ghost');
+    if (ghost) ghost.style.display = 'none';
+  }
+
+  _setSlotDragging(slotIdx, isDragging) {
+    const el = this.root.querySelector(`#wr-hand-row [data-hand-slot="${slotIdx}"]`);
+    if (el) el.classList.toggle('dragging', Boolean(isDragging));
+  }
+
   _handleWindowPointerMove(e) {
     if (!this._dragState) return;
     const dx = e.clientX - this._dragState.startX;
     const dy = e.clientY - this._dragState.startY;
     const dist = Math.hypot(dx, dy);
 
-    if (dist >= 14) {
+    if (dist >= 14 && !this._dragState.moved) {
       this._dragState.moved = true;
+      this._setSlotDragging(this._dragState.slot, true);
     }
 
-    const ghost = this.root.querySelector('#wr-drag-ghost');
     if (this._dragState.moved) {
-      if (ghost) {
-        ghost.style.display = '';
-        ghost.style.left = `${e.clientX}px`;
-        ghost.style.top = `${e.clientY}px`;
-      }
+      this._showGhostAt(this._dragState.slot, e.clientX, e.clientY);
       if (this._isPointOnBattlefield(e.clientX, e.clientY)) {
         this.hoverWorld = this._getWorldPos(e.clientX, e.clientY);
       } else {
@@ -343,8 +380,8 @@ export class BattleController {
     if (!drag) return;
     this._dragState = null;
 
-    const ghost = this.root.querySelector('#wr-drag-ghost');
-    if (ghost) ghost.style.display = 'none';
+    this._setSlotDragging(drag.slot, false);
+    this._hideGhost();
 
     if (drag.moved) {
       if (this._isPointOnBattlefield(e.clientX, e.clientY)) {
@@ -444,9 +481,11 @@ export class BattleController {
   }
 
   _bindControls() {
+    this.root.querySelector('#wr-start-plunger')?.addEventListener('click', () => this.startBattle());
     this.root.querySelector('#wr-start-battle-btn')?.addEventListener('click', () => this.startBattle());
 
     this.root.querySelector('#wr-auto-btn').addEventListener('click', () => {
+      if (!this.matchStarted) this.startBattle();
       this.autopilot = !this.autopilot;
       const btn = this.root.querySelector('#wr-auto-btn');
       btn.textContent = this.autopilot ? '托管中' : 'AI 托管';
@@ -505,8 +544,14 @@ export class BattleController {
     this.canvas.addEventListener('pointermove', (e) => {
       if (this.selectedSlot != null && this._isPointOnBattlefield(e.clientX, e.clientY)) {
         this.hoverWorld = this._getWorldPos(e.clientX, e.clientY);
+        if (!this._dragState?.moved) {
+          this._showGhostAt(this.selectedSlot, e.clientX, e.clientY);
+        }
       } else {
         this.hoverWorld = null;
+        if (!this._dragState?.moved) {
+          this._hideGhost();
+        }
       }
 
       if (this._panning && this._canvasGesture) {
@@ -537,6 +582,7 @@ export class BattleController {
         if (res.ok) {
           this.selectedSlot = null;
           this.hoverWorld = null;
+          this._hideGhost();
           this._syncHandUI(true);
         } else {
           const hitSwitchId = this.renderer.findSwitchAtWorld(this.sim, world.x, world.z);
@@ -557,7 +603,10 @@ export class BattleController {
     });
 
     this.canvas.addEventListener('pointerleave', () => {
-      if (!this._dragState) this.hoverWorld = null;
+      if (!this._dragState) {
+        this.hoverWorld = null;
+        this._hideGhost();
+      }
       this._panning = false;
       this._canvasGesture = null;
     });
@@ -587,13 +636,16 @@ export class BattleController {
 
   _handleKeyDown(e) {
     this._keysHeld.add(e.code);
-    if (e.key >= '1' && e.key <= '4' && this.matchStarted) {
+    if (e.key >= '1' && e.key <= '4') {
+      if (!this.matchStarted) this.startBattle();
       const idx = Number(e.key) - 1;
       sfx.play('select');
       this.selectedSlot = this.selectedSlot === idx ? null : idx;
+      if (this.selectedSlot == null) this._hideGhost();
       this._updateCardSelectionClasses();
     } else if (e.key === 'Escape') {
       this.selectedSlot = null;
+      this._hideGhost();
       this._updateCardSelectionClasses();
     } else if (e.key === ' ') {
       e.preventDefault();

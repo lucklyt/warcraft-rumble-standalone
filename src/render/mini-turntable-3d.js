@@ -66,6 +66,10 @@ export class MiniTurntable3D {
     this._loop(this._lastTime);
   }
 
+  showMini(slug, families = ['Neutral']) {
+    return this.setMini(slug, families);
+  }
+
   async setMini(slug, families = ['Neutral']) {
     const token = ++this._loadToken;
     const grp = await createMiniFigurineGroup({

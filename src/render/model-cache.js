@@ -154,8 +154,15 @@ export async function createMiniFigurineGroup(options) {
       const miniTpl = await loadGlbTemplate(entry.glb);
       const mini = useUniqueMaterials ? cloneSceneWithUniqueMaterials(miniTpl) : miniTpl.clone(true);
       if (mini.userData?.ownedMaterials) ownedMaterials.push(...mini.userData.ownedMaterials);
+      const box = new THREE.Box3().setFromObject(mini);
+      const sz = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(sz.x, sz.y, sz.z, 0.01);
+      if (maxDim > 4.5 || maxDim < 1.2) {
+        const normScale = 3.4 / maxDim;
+        mini.scale.setScalar(normScale);
+      }
       // Center figure on top of 3D pedestal (pedestal top surface is at y=0.344)
-      mini.position.y = noPedestal ? 0.02 : 0.34;
+      mini.position.y = (noPedestal ? 0.02 : 0.34) - box.min.y * mini.scale.y;
       group.add(mini);
       group.userData.figurineMesh = mini;
     } catch {
@@ -176,6 +183,7 @@ export function preloadDeckModels(slugs = []) {
     modelsManifest.poi?.['tower-enemy']?.glb,
     modelsManifest.poi?.['gold-mine']?.glb,
     modelsManifest.poi?.['treasure-chest']?.glb,
+    modelsManifest.poi?.['chest-hatch']?.glb,
     modelsManifest.poi?.['lane-switch']?.glb,
     modelsManifest.poi?.['lane-switch-arrow']?.glb,
     modelsManifest.poi?.['onyxia-warder']?.glb,

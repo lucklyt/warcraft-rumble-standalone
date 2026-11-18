@@ -485,6 +485,10 @@ export class BattleRenderer3D {
           if (mat.emissive) mat.emissive.setHex(flash ? 0xffffff : 0x000000);
           if (mat.emissiveIntensity !== undefined) mat.emissiveIntensity = flash ? 0.55 : 0.0;
         }
+        const turret = rec.turret || (rec.turret = rec.model.getObjectByName('ArclightTopDragon'));
+        if (turret && s.turretYaw != null) {
+          turret.rotation.y = -s.turretYaw - (s.team === 'enemy' ? Math.PI : 0);
+        }
       }
 
       // Ragnaros fiery shield & perched avatar on protected structure
@@ -554,30 +558,47 @@ export class BattleRenderer3D {
 
   _syncChests(sim) {
     for (const c of sim.chests || []) {
-      let grp = this._chestMeshes.get(c.id);
-      if (!grp) {
-        grp = new THREE.Group();
+      let rec = this._chestMeshes.get(c.id);
+      if (!rec) {
+        const grp = new THREE.Group();
         grp.position.set(c.x, 0, -c.z);
         this.chestsGroup.add(grp);
-        this._chestMeshes.set(c.id, grp);
 
+        const hatchGroup = new THREE.Group();
+        const chestGroup = new THREE.Group();
+        grp.add(hatchGroup, chestGroup);
+
+        rec = { group: grp, hatchGroup, chestGroup };
+        this._chestMeshes.set(c.id, rec);
+
+        const hatchUrl = this.manifest.poi?.['chest-hatch']?.glb;
+        if (hatchUrl) {
+          loadGlbTemplate(hatchUrl).then((tpl) => {
+            if (!this.disposed) hatchGroup.add(tpl.clone(true));
+          });
+        }
         const url = this.manifest.poi?.['treasure-chest']?.glb;
         if (url) {
           loadGlbTemplate(url).then((tpl) => {
             if (this.disposed) return;
             const model = tpl.clone(true);
-            grp.add(model);
+            chestGroup.add(model);
           });
         }
       }
-      grp.visible = Boolean(c.alive);
+      rec.group.visible = true;
+      rec.chestGroup.visible = Boolean(c.alive);
       if (c.alive) {
-        grp.rotation.y = Math.sin(this._time * 1.1) * 0.08;
+        rec.chestGroup.rotation.y = Math.sin(this._time * 1.1) * 0.08;
       }
     }
   }
 
   _syncSwitches(sim) {
+    const isOnyxia = (sim.mission?.id || 'onyxia_lair') === 'onyxia_lair';
+    this.switchesGroup.visible = !isOnyxia;
+    if (isOnyxia) return;
+
     for (const sw of Object.values(sim.switches || {})) {
       let rec = this._switchMeshes.get(sw.id);
       if (!rec) {

@@ -25,6 +25,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 import pygltflib
 import UnityPy
+import numpy as np
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -69,10 +70,15 @@ def parse_vec3_str(s: Optional[str]) -> List[float]:
     return parts[:3]
 
 
-def encode_gltf_image(img: Image.Image, max_size: int = 512, jpeg_quality: int = 82) -> Tuple[bytes, str, bool]:
+def encode_gltf_image(
+    img: Image.Image,
+    max_size: int = 512,
+    jpeg_quality: int = 82,
+    allow_alpha: bool = False,
+) -> Tuple[bytes, str, bool]:
     """
-    Encode PIL Image cleanly for core Three.js GLTFLoader (only JPEG or PNG; never bare WebP).
-    Uses PNG only if image actually carries meaningful transparency (min_alpha < 250).
+    Encode PIL Image cleanly for core Three.js GLTFLoader (opaque RGB JPEG by default so
+    Unity alpha-channel team color masks never turn into alphaMode='MASK' transparent holes).
     """
     w, h = img.size
     if max(w, h) > max_size:
@@ -80,7 +86,7 @@ def encode_gltf_image(img: Image.Image, max_size: int = 512, jpeg_quality: int =
         img = img.resize((max(1, int(round(w * ratio))), max(1, int(round(h * ratio)))), Image.LANCZOS)
 
     has_alpha = False
-    if img.mode in ("RGBA", "LA") or ("transparency" in img.info):
+    if allow_alpha and (img.mode in ("RGBA", "LA") or ("transparency" in img.info)):
         rgba = img.convert("RGBA")
         alpha_ext = rgba.getchannel("A").getextrema()
         if alpha_ext[0] < 245:
@@ -97,10 +103,120 @@ def encode_gltf_image(img: Image.Image, max_size: int = 512, jpeg_quality: int =
     return buf.getvalue(), "image/jpeg", has_alpha
 
 
+def apply_team_color_to_pil(img: Image.Image, team: str) -> Image.Image:
+    """
+    Blizzard stores Team Color Mask in the inverse alpha channel (alpha=0 -> 100% team tint).
+    Composite official Player Blue or Enemy Red modulated by base luminance into opaque RGB.
+    """
+    arr = np.asarray(img.convert("RGBA"), dtype=np.float32).copy()
+    alpha = arr[:, :, 3:4] / 255.0
+    mask = 1.0 - alpha
+    tcol = np.array([35.0, 125.0, 245.0] if team == "player" else [225.0, 42.0, 32.0], dtype=np.float32)
+    lum = (arr[:, :, 0:1] * 0.299 + arr[:, :, 1:2] * 0.587 + arr[:, :, 2:3] * 0.114) / 140.0
+    tinted = np.clip(tcol * np.clip(lum, 0.35, 1.45), 0, 255)
+    arr[:, :, :3] = arr[:, :, :3] * alpha + tinted * mask
+    return Image.fromarray(np.clip(arr[:, :, :3], 0, 255).astype(np.uint8), mode="RGB")
+
+
+def filter_stray_mesh_islands(geom: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Remove small disconnected origin-hanging weapon or floor-FX islands (<25% of tris)
+    that pollute resting character meshes extracted from UnityPrefabs.
+    """
+    positions = geom["positions"]
+    normals = geom["normals"]
+    uvs = geom["uvs"]
+    indices = geom["indices"]
+    if len(indices) < 12:
+        return geom
+
+    # Group physically coincident vertices (merging UV seams) via rounded coordinates
+    coord_map: Dict[Tuple[float, float, float], int] = {}
+    vert_to_phys: List[int] = []
+    for p in positions:
+        key = (round(p[0], 4), round(p[1], 4), round(p[2], 4))
+        pid = coord_map.get(key)
+        if pid is None:
+            pid = len(coord_map)
+            coord_map[key] = pid
+        vert_to_phys.append(pid)
+
+    n_phys = len(coord_map)
+    parent = list(range(n_phys))
+
+    def find(x: int) -> int:
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(a: int, b: int) -> None:
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    tris = [(indices[i], indices[i + 1], indices[i + 2]) for i in range(0, len(indices) - 2, 3)]
+    for a, b, c in tris:
+        pa, pb, pc = vert_to_phys[a], vert_to_phys[b], vert_to_phys[c]
+        union(pa, pb)
+        union(pa, pc)
+
+    islands: Dict[int, List[Tuple[int, int, int]]] = {}
+    for a, b, c in tris:
+        islands.setdefault(find(vert_to_phys[a]), []).append((a, b, c))
+
+    if len(islands) <= 1:
+        return geom
+
+    total_tris = len(tris)
+    kept_tris: List[Tuple[int, int, int]] = []
+    for _, island_tris in islands.items():
+        if len(island_tris) < 0.25 * total_tris:
+            vs = [positions[v] for t in island_tris for v in t]
+            xs = [p[0] for p in vs]
+            ys = [p[1] for p in vs]
+            zs = [p[2] for p in vs]
+            min_y, max_y = min(ys), max(ys)
+            min_x, max_x = min(xs), max(xs)
+            min_z, max_z = min(zs), max(zs)
+            is_deep_neg_y = min_y < -0.15
+            is_floor_sprawled = max_y < 0.26 and (
+                max_z > 0.55 or min_z < -0.55 or max_x > 0.55 or min_x < -0.55
+            )
+            if is_deep_neg_y or is_floor_sprawled:
+                continue
+        kept_tris.extend(island_tris)
+
+    if not kept_tris or len(kept_tris) == total_tris:
+        return geom
+
+    remap: Dict[int, int] = {}
+    new_pos, new_nrm, new_uv, new_idx = [], [], [], []
+    for a, b, c in kept_tris:
+        for v in (a, b, c):
+            nv = remap.get(v)
+            if nv is None:
+                nv = len(new_pos)
+                remap[v] = nv
+                new_pos.append(positions[v])
+                new_nrm.append(normals[v])
+                new_uv.append(uvs[v])
+            new_idx.append(nv)
+
+    return {
+        "name": geom.get("name", "filtered"),
+        "positions": new_pos,
+        "normals": new_nrm,
+        "uvs": new_uv,
+        "indices": new_idx,
+    }
+
+
 def parse_obj_groups(
     obj_text: str,
     transform_fn=None,
     only_groups: Optional[Set[str]] = None,
+    exclude_group_suffixes: Optional[Tuple[str, ...]] = None,
 ) -> List[Dict[str, Any]]:
     """
     Parse Wavefront OBJ text (optionally splitting by `g` groups) into glTF-ready primitive arrays.
@@ -128,6 +244,8 @@ def parse_obj_groups(
             current_group = " ".join(parts[1:])
         elif tag == "f" and len(parts) >= 4:
             if only_groups is not None and current_group not in only_groups:
+                continue
+            if exclude_group_suffixes and current_group.endswith(exclude_group_suffixes):
                 continue
             fv = parts[1:]
             bucket = groups.setdefault(current_group, [])
@@ -200,6 +318,9 @@ def build_multimesh_glb(
     entries: List[Dict[str, Any]],
     out_path: Path,
     generator: str = "WarcraftRumbleOnyxia3D",
+    shared_center_xz: bool = False,
+    shared_ground_min_y: bool = False,
+    shared_target_max_dim: Optional[float] = None,
 ) -> Dict[str, Any]:
     """
     Build a multi-node / multi-material .glb file.
@@ -252,8 +373,10 @@ def build_multimesh_glb(
         buffer_views.append(bv)
         return bv_idx
 
-    def add_image_tex(img: Image.Image, tex_size: int, jpeg_quality: int) -> Tuple[int, bool]:
-        raw, mime, has_alpha = encode_gltf_image(img, max_size=tex_size, jpeg_quality=jpeg_quality)
+    def add_image_tex(img: Image.Image, tex_size: int, jpeg_quality: int, allow_alpha: bool = False) -> Tuple[int, bool]:
+        raw, mime, has_alpha = encode_gltf_image(
+            img, max_size=tex_size, jpeg_quality=jpeg_quality, allow_alpha=allow_alpha
+        )
         bv_idx = append_bytes(raw)
         img_idx = len(images)
         images.append(pygltflib.Image(bufferView=bv_idx, mimeType=mime))
@@ -261,22 +384,49 @@ def build_multimesh_glb(
         textures.append(pygltflib.Texture(sampler=0, source=img_idx))
         return tex_idx, has_alpha
 
+    # Optional rigid multi-part normalization (keeps mounts/riders & weapons rigidly aligned)
+    prepared_positions: List[List[List[float]]] = []
+    raw_min = [float("inf"), float("inf"), float("inf")]
+    raw_max = [float("-inf"), float("-inf"), float("-inf")]
+    for entry in entries:
+        sc = float(entry.get("scale", 1.0))
+        pts = [[p[0] * sc, p[1] * sc, p[2] * sc] for p in entry["geom"]["positions"]]
+        prepared_positions.append(pts)
+        for p in pts:
+            if p[0] < raw_min[0]:
+                raw_min[0] = p[0]
+            if p[1] < raw_min[1]:
+                raw_min[1] = p[1]
+            if p[2] < raw_min[2]:
+                raw_min[2] = p[2]
+            if p[0] > raw_max[0]:
+                raw_max[0] = p[0]
+            if p[1] > raw_max[1]:
+                raw_max[1] = p[1]
+            if p[2] > raw_max[2]:
+                raw_max[2] = p[2]
+
+    shared_cx = (raw_min[0] + raw_max[0]) * 0.5 if shared_center_xz else 0.0
+    shared_cz = (raw_min[2] + raw_max[2]) * 0.5 if shared_center_xz else 0.0
+    shared_gy = raw_min[1] if shared_ground_min_y else 0.0
+    shared_span = max(raw_max[0] - raw_min[0], raw_max[1] - raw_min[1], raw_max[2] - raw_min[2], 0.01)
+    shared_norm_scale = (float(shared_target_max_dim) / shared_span) if shared_target_max_dim else 1.0
+
     global_min = [float("inf"), float("inf"), float("inf")]
     global_max = [float("-inf"), float("-inf"), float("-inf")]
 
     for idx_entry, entry in enumerate(entries):
         geom = entry["geom"]
-        positions = [list(p) for p in geom["positions"]]
+        positions = prepared_positions[idx_entry]
         normals = geom["normals"]
         uvs = geom["uvs"]
         indices = geom["indices"]
 
-        sc = float(entry.get("scale", 1.0))
-        if sc != 1.0:
+        if shared_center_xz or shared_ground_min_y or shared_target_max_dim:
             for p in positions:
-                p[0] *= sc
-                p[1] *= sc
-                p[2] *= sc
+                p[0] = (p[0] - shared_cx) * shared_norm_scale
+                p[1] = (p[1] - shared_gy) * shared_norm_scale
+                p[2] = (p[2] - shared_cz) * shared_norm_scale
 
         xs = [p[0] for p in positions]
         ys = [p[1] for p in positions]
@@ -285,10 +435,10 @@ def build_multimesh_glb(
         min_y, max_y = min(ys), max(ys)
         min_z, max_z = min(zs), max(zs)
 
-        cx = (min_x + max_x) * 0.5 if entry.get("center_xz") else 0.0
-        cz = (min_z + max_z) * 0.5 if entry.get("center_xz") else 0.0
+        cx = (min_x + max_x) * 0.5 if (entry.get("center_xz") and not shared_center_xz) else 0.0
+        cz = (min_z + max_z) * 0.5 if (entry.get("center_xz") and not shared_center_xz) else 0.0
         dy = 0.0
-        if entry.get("ground_mode") == "min_y":
+        if entry.get("ground_mode") == "min_y" and not shared_ground_min_y:
             dy = -min_y
         elif entry.get("ground_mode") == "offset_y":
             dy = float(entry.get("y_offset", 0.0))
@@ -785,91 +935,115 @@ def extract_poi_and_special_glbs() -> Dict[str, Any]:
         ],
     )
 
-    # 2. Player Keep (Judgement Barracks) & Player Guard Tower
-    env_j = load_bundle("tact", "cosmetics_skins_structure_structurejudgement.bundle")
-    tex_jb = get_tex(env_j, "Judgement_Barracks_Tex_Color")
-    tex_jt = get_tex(env_j, "Judgement_Toppers_Tex_Color")
-    m_jbar = get_mesh_by_name_or_pid(env_j, name="JudgementBarracks_Model")
+    # 2. Authentic Default Structures: Arclight Keep & Dragon Towers (with Team-Color Masks)
+    env_ftue = load_bundle("apk", "assets/assetpack/shared_ftue.bundle")
+    env_emb = load_bundle("apk", "assets/assetpack/shared_ftue_embedded.bundle")
+    env_drg = load_bundle("apk", "assets/assetpack/unitassets_poi_structurearclightdragon.bundle")
+
+    raw_bar_tex = get_tex(env_emb, "Arclight_Barracks_Tex_Color")
+    raw_top_tex = get_tex(env_emb, "Arclight_Top_Tex_Color")
+    tex_bar_p = apply_team_color_to_pil(raw_bar_tex, "player")
+    tex_bar_e = apply_team_color_to_pil(raw_bar_tex, "enemy")
+    tex_top_p = apply_team_color_to_pil(raw_top_tex, "player")
+    tex_top_e = apply_team_color_to_pil(raw_top_tex, "enemy")
+
+    m_bar = get_mesh_by_name_or_pid(env_emb, name="ArclightBarracks_Model")
+    m_tow = get_mesh_by_name_or_pid(env_ftue, name="ArclightTower_Model")
+    m_tdrg = get_mesh_by_name_or_pid(env_drg, name="ArclightTopDragon_Model")
+
     save_single(
         "player-keep",
         [
             {
-                "name": "JudgementBarracks",
+                "name": "ArclightBarracks",
                 "geom": merge_parts_geometry(
-                    parse_obj_groups(m_jbar.export(), transform_fn=lambda p, n: ([-p[0], p[1], -p[2]], [-n[0], n[1], -n[2]]))
+                    parse_obj_groups(
+                        m_bar.export(),
+                        transform_fn=lambda p, n: ([p[0], p[1] + 0.18, p[2]], [n[0], n[1], n[2]]),
+                    )
                 ),
-                "base_color_img": tex_jb,
+                "base_color_img": tex_bar_p,
                 "tex_size": 512,
-                "center_xz": True,
-                "ground_mode": "offset_y",
-                "y_offset": 0.2,
-                "scale": 1.35,
-            }
+                "ground_mode": "none",
+                "scale": 1.18,
+            },
+            {
+                "name": "ArclightTopDragon",
+                "geom": merge_parts_geometry(
+                    parse_obj_groups(
+                        m_tdrg.export(),
+                        transform_fn=lambda p, n: ([-p[0], p[1] + 3.37, -p[2]], [-n[0], n[1], -n[2]]),
+                    )
+                ),
+                "base_color_img": tex_top_p,
+                "tex_size": 512,
+                "ground_mode": "none",
+                "scale": 1.18,
+            },
         ],
     )
 
-    m_jtow = get_mesh_by_name_or_pid(env_j, name="JudgementTower_Model")
-    m_jtop = get_mesh_by_name_or_pid(env_j, pid=8397542379385808599)
     save_single(
         "tower-player",
         [
             {
-                "name": "JudgementTower",
+                "name": "ArclightTower",
                 "geom": merge_parts_geometry(
-                    parse_obj_groups(m_jtow.export(), transform_fn=lambda p, n: ([-p[0], p[1], -p[2]], [-n[0], n[1], -n[2]]))
+                    parse_obj_groups(
+                        m_tow.export(),
+                        transform_fn=lambda p, n: ([-p[0], p[1] + 0.19, -p[2]], [-n[0], n[1], -n[2]]),
+                    )
                 ),
-                "base_color_img": tex_jb,
+                "base_color_img": tex_bar_p,
                 "tex_size": 512,
-                "center_xz": False,
-                "ground_mode": "offset_y",
-                "y_offset": -0.25,
-                "scale": 1.35,
+                "ground_mode": "none",
+                "scale": 1.18,
             },
             {
-                "name": "JudgementSwordTop",
+                "name": "ArclightTopDragon",
                 "geom": merge_parts_geometry(
-                    parse_obj_groups(m_jtop.export(), transform_fn=lambda p, n: ([-p[0], p[1], -p[2]], [-n[0], n[1], -n[2]]))
+                    parse_obj_groups(
+                        m_tdrg.export(),
+                        transform_fn=lambda p, n: ([-p[0], p[1] + 3.37, -p[2]], [-n[0], n[1], -n[2]]),
+                    )
                 ),
-                "base_color_img": tex_jt,
+                "base_color_img": tex_top_p,
                 "tex_size": 512,
-                "center_xz": False,
-                "ground_mode": "offset_y",
-                "y_offset": -0.25,
-                "scale": 1.35,
+                "ground_mode": "none",
+                "scale": 1.18,
             },
         ],
     )
 
-    # 3. Enemy Tower (Horde Tower + Top Guard)
-    env_h = load_bundle("tact", "cosmetics_skins_structure_structurehorde.bundle")
-    tex_hb = get_tex(env_h, "Horde_Barracks_Tex_Color")
-    tex_ht = get_tex(env_h, "Horde_Toppers_Tex_Color")
-    m_htow = get_mesh_by_name_or_pid(env_h, name="HordeTower_Model")
-    m_hguard = get_mesh_by_name_or_pid(env_h, name="HordeTopGuard_Model")
+    # 3. Enemy Tower (red team-color Dragon Tower; rotated Math.PI in runtime to face South)
     save_single(
         "tower-enemy",
         [
             {
-                "name": "HordeTower",
+                "name": "ArclightTower",
                 "geom": merge_parts_geometry(
-                    parse_obj_groups(m_htow.export(), transform_fn=lambda p, n: ([-p[0], p[1], -p[2]], [-n[0], n[1], -n[2]]))
+                    parse_obj_groups(
+                        m_tow.export(),
+                        transform_fn=lambda p, n: ([-p[0], p[1] + 0.19, -p[2]], [-n[0], n[1], -n[2]]),
+                    )
                 ),
-                "base_color_img": tex_hb,
+                "base_color_img": tex_bar_e,
                 "tex_size": 512,
-                "ground_mode": "offset_y",
-                "y_offset": 0.0,
-                "scale": 1.35,
+                "ground_mode": "none",
+                "scale": 1.18,
             },
             {
-                "name": "HordeTopGuard",
+                "name": "ArclightTopDragon",
                 "geom": merge_parts_geometry(
-                    parse_obj_groups(m_hguard.export(), transform_fn=lambda p, n: ([-p[0], p[1], -p[2]], [-n[0], n[1], -n[2]]))
+                    parse_obj_groups(
+                        m_tdrg.export(),
+                        transform_fn=lambda p, n: ([-p[0], p[1] + 3.37, -p[2]], [-n[0], n[1], -n[2]]),
+                    )
                 ),
-                "base_color_img": tex_ht,
+                "base_color_img": tex_top_e,
                 "tex_size": 512,
-                "ground_mode": "offset_y",
-                "y_offset": 0.0,
-                "scale": 1.35,
+                "ground_mode": "none",
+                "scale": 1.18,
             },
         ],
     )
@@ -893,9 +1067,10 @@ def extract_poi_and_special_glbs() -> Dict[str, Any]:
         ],
     )
 
-    # 5. Treasure Chest (Y-up pid=7602436547955870921)
+    # 5. Treasure Chest (keyhole facing +Z South toward camera) & Ground Hatch Pad
     env_tc = load_bundle("apk", "assets/assetpack/unitassets_poi_treasurechest.bundle")
     m_tc = get_mesh_by_name_or_pid(env_tc, pid=7602436547955870921)
+    m_hatch = get_mesh_by_name_or_pid(env_tc, pid=3216511333672245735)
     tex_tc = get_tex(env_tc, "TreasureChest_Color")
     save_single(
         "treasure-chest",
@@ -903,7 +1078,23 @@ def extract_poi_and_special_glbs() -> Dict[str, Any]:
             {
                 "name": "TreasureChest",
                 "geom": merge_parts_geometry(
-                    parse_obj_groups(m_tc.export(), transform_fn=lambda p, n: ([-p[0], p[1], -p[2]], [-n[0], n[1], -n[2]]))
+                    parse_obj_groups(m_tc.export(), transform_fn=lambda p, n: ([p[0], p[1], p[2]], [n[0], n[1], n[2]]))
+                ),
+                "base_color_img": tex_tc,
+                "tex_size": 512,
+                "center_xz": True,
+                "ground_mode": "min_y",
+                "scale": 0.95,
+            }
+        ],
+    )
+    save_single(
+        "chest-hatch",
+        [
+            {
+                "name": "POIHatchDoors",
+                "geom": merge_parts_geometry(
+                    parse_obj_groups(m_hatch.export(), transform_fn=unity_obj_rot_x_neg90_to_three)
                 ),
                 "base_color_img": tex_tc,
                 "tex_size": 512,
@@ -1091,9 +1282,216 @@ def recompress_glb(src_path: Path, dst_path: Path, max_size: int = 512, jpeg_qua
     return dst_path.stat().st_size
 
 
+EXPLICIT_MINI_SOURCES: Dict[str, List[Tuple[str, str]]] = {
+    "abomination": [("Abomination_Model.obj", "Abomination_Tex_Boss_Color.png")],
+    "ancient-of-war": [("AncientOfWar_Model.obj", "AncientOfWar_Tex_Color.png")],
+    "angry-chickens": [("AngryChickens_Model.obj", "AngryChickens_Tex_Color.png")],
+    "anub-arak": [("Anubarak_Model.obj", "Anubarak_Tex_Color.png")],
+    "baron-rivendare": [
+        ("BaronRivendare_Model.obj", "BaronRivendare_Tex_Boss_Color.png"),
+        ("Mount:BaronRivendare_Horse_Model.obj", "BaronRivendare_Tex_Horse_Boss_Color.png"),
+    ],
+    "bat-rider": [
+        ("BatRider_Model.obj", "BatRider_Tex_Color.png"),
+        ("Mount:BatRiderBat_Model.obj", "BatRider_Tex_Bat_Color.png"),
+    ],
+    "bloodmage-thalnos": [("BloodmageThalnos_Model.obj", "BloodmageThalnos_Tex_Color.png")],
+    "bog-beast": [
+        ("BogBeast_Model.obj", "BogBeast_Tex_Color.png"),
+        ("BogBeast_Plants_Model.obj", "BogBeast_Tex_Color.png"),
+    ],
+    "cenarius": [("Cenarius_Model.obj", "Cenarius_Tex_Color.png")],
+    "chimaera": [("Chimaera_Model.obj", "Chimaera_Tex_Color.png")],
+    "core-hounds": [("CoreHounds_Model.obj", "CoreHounds_Tex_Color.png")],
+    "dark-iron-miner": [("DarkIronDwarf_Model.obj", "DarkIronDwarf_Tex_Color.png")],
+    "darkspear-troll": [("DarkspearTroll_Model.obj", "DarkspearTroll_Tex_Color.png")],
+    "defias-bandits": [("DefiasBandits_Model.obj", "DefiasBandits_Tex_Color.png")],
+    "drake": [("Drake_Model.obj", "Drake_Color.png")],
+    "druid-of-the-claw": [("DruidOfClaw_Model.obj", "DruidOfClaw_Color.png")],
+    "dryad": [("Dryad_Model.obj", "Dryad_Tex_Color.png")],
+    "emperor-thaurissan": [
+        ("Thaurissan_Model.obj", "Thaurissan_Tex_Color.png"),
+        ("Thaurissan_Hair_Model.obj", "Thaurissan_Tex_Color.png"),
+    ],
+    "faerie-dragon": [("FaerieDragon_Model.obj", "FaerieDragon_Tex_Color.png")],
+    "fire-elemental": [("FireElemental_Model.obj", "FireElemental_Tex_Color.png")],
+    "firehammer": [("FireHammer_Model.obj", "FireHammer_Tex_Color.png")],
+    "flamewaker": [("Flamewaker_Model.obj", "Flamewaker_Tex_Color.png")],
+    "general-drakkisath": [("Drakkisath_Model.obj", "Drakkisath_Tex_Boss_Color.png")],
+    "gnoll-brute": [("GnollBrute_Model.obj", "GnollBrute_Tex_Color.png")],
+    "goblin-sapper": [
+        ("GoblinSapper_Model.obj", "GoblinSapper_Tex_Color.png"),
+        ("GoblinSapperBarrel_Model.obj", "GoblinSapper_Tex_Color.png"),
+    ],
+    "grommash-hellscream": [("Grom_Model.obj", "Grommash_Tex_Color.png")],
+    "gryphon-rider": [
+        ("Dwarf_Model.obj", "GryphonRider_Tex_Dwarf_Color.png"),
+        ("Mount:Gryphon_Model.obj", "GryphonRider_Tex_Gryphon_Color.png"),
+    ],
+    "headless-horseman": [
+        ("HeadlessHorseman_Rider_Model.obj", "HeadlessHorseman_Tex_Rider_Color.png"),
+        ("Mount:HeadlessHorseman_Horse_Model.obj", "HeadlessHorseman_Tex_Horse_Color.png"),
+    ],
+    "hogger": [("Hogger_Model.obj", "Hogger_Tex_Color.png")],
+    "maiev-shadowsong": [("Maiev_Model.obj", "Maiev_Tex_Color.png")],
+    "malfurion": [("Malfurion_Model.obj", "Malfurion_Tex_Color.png")],
+    "meat-wagon": [("MeatWagon_Model.obj", "MeatWagon_Tex_Color.png")],
+    "moonkin": [("Moonkin_Model.obj", "Moonkin_Tex_Color.png")],
+    "mountaineer": [
+        ("MountaineerDwarf_Model.obj", "Mountaineer_Tex_Dwarf_Boss_Color.png"),
+        ("MountaineerBear_Model.obj", "Mountaineer_Tex_Bear_Boss_Color.png"),
+    ],
+    "murloc-tidehunters": [("MurlocTidehunters_Model.obj", "MurlocTidehunters_Tex_Blue_Color.png")],
+    "old-murk-eye": [("OldMurkEye_Model.obj", "OldMurkEye_Tex_Color.png")],
+    "onu": [("Onu_Model.obj", "Onu_Tex_Boss_Color.png")],
+    "orgrim-doomhammer": [("Doomhammer_Warrior_Model.obj", "Doomhammer_Tex_Color.png")],
+    "plague-farmer": [("PlagueFarmer_Model.obj", "PlagueFarmer_Tex_Color.png")],
+    "priestess": [("NPC_Priestess_Model.obj", "NPC_Priestess_Tex_Color.png")],
+    "prowler": [("Prowler_Model.obj", "Wereprowler_Tex_Color.png")],
+    "ragnaros": [
+        ("Ragnaros_Raid_Body.obj", "Ragnaros_Tex_Raid_Color.png"),
+        ("Ragnaros_Raid_Base.obj", "Ragnaros_Tex_Raid_Color.png"),
+    ],
+    "rend-blackhand": [
+        ("Rend_Model.obj", "Rend_Tex_Boss_Color.png"),
+        ("Mount:Drake_Model.obj", "Drake_Boss_Color.png"),
+    ],
+    "s-a-f-e-pilot": [
+        ("GnomePilot_Model.obj", "GnomishFlyingMachine_Tex_Pilot_Color.png"),
+        ("Mount:GnomishFlyingMachine_Model.obj", "GnomishFlyingMachine_Tex_Color.png"),
+    ],
+    "skeletons": [("SkeletonWarrior_Model.obj", "SkeletonWarrior_Tex_Color.png")],
+    "sneed": [("Sneed_Model.obj", "Sneed_Shredder_Color.png")],
+    "swole-troll": [("Jinrokh_Model.obj", "Jinrokh_Tex_Color.png")],
+    "sylvanas-windrunner": [("Sylvanas_Model.obj", "Sylvanas_Tex_Color.png")],
+    "thrall": [("Thrall_Model.obj", "Thrall_Tex_Color.png")],
+    "vultures": [("Vulture_Model.obj", "Vulture_Tex_Color.png")],
+    "warsong-grunts": [("WarsongGrunt_Model.obj", "WarsongGrunts_Tex_Color.png")],
+    "warsong-raider": [
+        ("WarsongRaider_Model.obj", "WarsongRaider_Tex_Orc_Color.png"),
+        ("Mount:WarsongRaider_Wolf_Model.obj", "WarsongRaider_Tex_Wolf_Color.png"),
+    ],
+    "whelp-eggs": [
+        ("WhelpEggs_Egg.obj", "WhelpEggs_Tex_Color.png"),
+        ("WhelpEggs_Dragon.obj", "WhelpEggs_Tex_Color.png"),
+    ],
+    "witch-doctor": [("WitchDoctor_Model.obj", "WitchDoctor_Tex_Color.png")],
+    "worgen": [("Worgen_Model.obj", "Worgen_Tex_Color.png")],
+    "ysera": [("Ysera_Model.obj", "Ysera_Boss_Tex_Color.png")],
+}
+
+
+def build_purified_mini_entries(
+    slug: str,
+    raw_dir: Path,
+    tact_cache: Dict[str, UnityPy.Environment],
+) -> List[Dict[str, Any]]:
+    def make_entry(name: str, obj_text: str, tex_img: Image.Image, sub0_only: bool = False) -> Dict[str, Any]:
+        parts = parse_obj_groups(
+            obj_text,
+            exclude_group_suffixes=("_1", "_2", "_3") if sub0_only else None,
+        )
+        geom = filter_stray_mesh_islands(merge_parts_geometry(parts))
+        return {
+            "name": name,
+            "geom": geom,
+            "base_color_img": tex_img,
+            "tex_size": 512,
+            "jpeg_quality": 82,
+        }
+
+    def get_cached_bundle(bname: str) -> UnityPy.Environment:
+        if bname not in tact_cache:
+            tact_cache[bname] = load_bundle("tact", bname)
+        return tact_cache[bname]
+
+    if slug == "huntress":
+        env_w = get_cached_bundle("unitstatue_wolfrunner.bundle")
+        return [
+            make_entry(
+                "HuntressElf_Model",
+                (raw_dir / "HuntressElf_Model.obj").read_text(encoding="utf-8"),
+                get_tex(env_w, "Huntress_Tex_Color"),
+            ),
+            make_entry(
+                "Mount:HuntressCat_Model",
+                (raw_dir / "Mount:HuntressCat_Model.obj").read_text(encoding="utf-8"),
+                get_tex(env_w, "Wolfrunner_Tex_Cat_Boss_Color"),
+            ),
+        ]
+
+    if slug == "spiderlings":
+        env_mf = get_cached_bundle("unitstatue_motherfang.bundle")
+        return [
+            make_entry(
+                "Spiderling",
+                get_mesh_by_name_or_pid(env_mf, name="Spiderling").export(),
+                get_tex(env_mf, "Spiderling_Tex_Color"),
+            )
+        ]
+
+    if slug == "skeleton-party":
+        env_sm = get_cached_bundle("unitassets_unit_skeletonmage.bundle")
+        return [
+            make_entry(
+                "SkeletonMage_Model",
+                get_mesh_by_name_or_pid(env_sm, name="SkeletonMage_Model").export(),
+                get_tex(env_sm, "SkeletonMage_Tex_Color"),
+            )
+        ]
+
+    if slug in EXPLICIT_MINI_SOURCES:
+        entries = []
+        sub0 = slug == "general-drakkisath"
+        for obj_name, tex_name in EXPLICIT_MINI_SOURCES[slug]:
+            obj_p = raw_dir / obj_name
+            tex_p = raw_dir / tex_name
+            if not obj_p.exists():
+                raise FileNotFoundError(f"Missing {obj_p} for {slug}")
+            if not tex_p.exists():
+                raise FileNotFoundError(f"Missing {tex_p} for {slug}")
+            with Image.open(tex_p) as im:
+                tex_copy = im.copy()
+            entries.append(make_entry(obj_p.stem, obj_p.read_text(encoding="utf-8"), tex_copy, sub0_only=sub0))
+        return entries
+
+    # Fallback: single clean character mesh + _Color texture from raw/<slug>/
+    exclude_words = ("fx_", "swoosh", "missile", "airdrop", "rock", "terrain", "graves", "dirt", "polysurface")
+    objs = sorted(
+        p for p in raw_dir.glob("*.obj")
+        if not any(w in p.name.lower() for w in exclude_words)
+    )
+    if not objs:
+        objs = sorted(raw_dir.glob("*.obj"))
+    color_pngs = sorted(
+        p for p in raw_dir.glob("*.png")
+        if "color" in p.name.lower() and not p.name.startswith(("Statue_", "FX_"))
+    )
+    if not color_pngs:
+        color_pngs = sorted(
+            p for p in raw_dir.glob("*.png")
+            if not p.name.startswith(("Statue_", "FX_"))
+        )
+    if not objs or not color_pngs:
+        raise FileNotFoundError(f"Missing fallback OBJ/PNG in {raw_dir}")
+
+    tex_path = color_pngs[0]
+    with Image.open(tex_path) as im:
+        tex_copy = im.copy()
+    return [
+        make_entry(
+            obj_p.stem,
+            obj_p.read_text(encoding="utf-8"),
+            tex_copy,
+        )
+        for obj_p in objs
+    ]
+
+
 def repack_minis_and_pedestals(poi_manifest: Dict[str, Any]):
-    print("\n=== 1D. Repacking & Compressing 81 Mini .glbs + 7 Pedestals ===")
+    print("\n=== 1D. Building Purified 81 Mini .glbs + 7 Pedestals ===")
     src_models_dir = MINIAPP_DIR / "output/models"
+    raw_models_dir = src_models_dir / "raw"
     raw_manifest = json.loads((src_models_dir / "manifest.json").read_text(encoding="utf-8"))
 
     pedestals_out: Dict[str, str] = {}
@@ -1108,23 +1506,28 @@ def repack_minis_and_pedestals(poi_manifest: Dict[str, Any]):
 
     minis_out: Dict[str, Any] = {}
     mini_bytes = 0
+    tact_cache: Dict[str, UnityPy.Environment] = {}
     for entry in raw_manifest.get("minis", []):
         slug = entry["slug"]
-        src = src_models_dir / entry["glbFile"]
-        if not src.exists():
-            continue
+        raw_dir = raw_models_dir / slug
         dst = OUT_MINIS_DIR / f"{slug}.glb"
-        sz = recompress_glb(src, dst, max_size=512, jpeg_quality=80)
+        mini_entries = build_purified_mini_entries(slug, raw_dir, tact_cache)
+        res = build_multimesh_glb(
+            mini_entries,
+            dst,
+            shared_center_xz=True,
+            shared_ground_min_y=True,
+            shared_target_max_dim=3.4,
+        )
+        sz = res["bytes"]
         mini_bytes += sz
         fam = (entry.get("families") or ["Neutral"])[0].lower()
         if fam not in pedestals_out:
             fam = "neutral"
-        bbox = entry.get("boundingBox", {})
-        sz_vec = bbox.get("size", [2.5, 3.8, 2.5])
         minis_out[slug] = {
             "glb": f"./r/3d/minis/{slug}.glb",
             "pedestal": fam,
-            "height": round(float(sz_vec[1]), 2),
+            "height": round(float(res["bbox"]["size"][1]), 2),
             "bytes": sz,
         }
 

@@ -811,8 +811,12 @@ export function renderLobbyView(root, modalRoot, appState, callbacks) {
     const cvs = modalRoot.querySelector('#wr-inspect-canvas');
     const mini = MINI_BY_SLUG.get(appState.inspectSlot.slug);
     if (cvs && mini) {
-      activeTurntable = new MiniTurntable3D(cvs);
-      activeTurntable.showMini(mini.slug, mini.families);
+      try {
+        activeTurntable = new MiniTurntable3D(cvs);
+        activeTurntable.setMini(mini.slug, mini.families);
+      } catch (err) {
+        console.warn('MiniTurntable3D unavailable:', err);
+      }
     }
   }
 

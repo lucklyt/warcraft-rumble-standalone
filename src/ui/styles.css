@@ -2445,16 +2445,23 @@ button {
   object-fit: cover;
 }
 
-/* Selected state matches real_onyxia_01.jpg Slot 1: empty dark recessed alcove! */
+/* Selected state lifts figurine cleanly with glowing frame */
 .wr-statue-slot.selected {
-  box-shadow: inset 0 0 0 2px #38bdf8, 0 0 10px rgba(56, 189, 248, 0.55);
+  box-shadow: inset 0 0 0 2px #38bdf8, 0 0 14px rgba(56, 189, 248, 0.75);
 }
 
-.wr-statue-slot.selected .slot-pedestal,
-.wr-statue-slot.selected .slot-ready-ring,
-.wr-statue-slot.selected .slot-crown,
 .wr-statue-slot.selected .slot-fig,
-.wr-statue-slot.selected .slot-bottom-badges {
+.wr-statue-slot.selected .slot-pedestal {
+  transform: translateY(-9px) scale(1.08);
+  opacity: 1;
+}
+
+/* Empty dark recessed alcove only while actively dragging on cursor */
+.wr-statue-slot.dragging .slot-pedestal,
+.wr-statue-slot.dragging .slot-ready-ring,
+.wr-statue-slot.dragging .slot-crown,
+.wr-statue-slot.dragging .slot-fig,
+.wr-statue-slot.dragging .slot-bottom-badges {
   opacity: 0;
   transform: translateY(-10px) scale(0.8);
 }

@@ -683,6 +683,7 @@ export class CombatSimulation {
       if (s.attackCooldown <= 0) {
         const target = this.findClosestTarget(s.x, s.z, s.team, s.range, true);
         if (target) {
+          s.turretYaw = Math.atan2(target.x - s.x, target.z - s.z);
           s.attackCooldown = s.attackInterval;
           this.spawnProjectile({
             x: s.x,
