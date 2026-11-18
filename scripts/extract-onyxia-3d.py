@@ -18,6 +18,7 @@ import json
 import os
 import re
 import struct
+import sys
 import zipfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -608,9 +609,9 @@ def unity_obj_rot_x_neg90_to_three(pos: List[float], nrm: List[float]):
 
 
 def extract_onyxia_environment_glb():
-    print("\n=== 1B. Building public/r/3d/env/onyxia-lair.glb ===")
+    print("\n=== 1B. Building public/r/3d/env/onyxia-lair.glb from baked Combined Meshes ===")
     env = UnityPy.load(str(TACT_DIR / "mission_onyxia.bundle"))
-    meshes = {o.read().m_Name: o.read() for o in env.objects if o.type.name == "Mesh"}
+    mats = {o.path_id: o.read().m_Name for o in env.objects if o.type.name == "Material"}
     textures = {o.read().m_Name: o.read().image for o in env.objects if o.type.name == "Texture2D"}
 
     env_props = UnityPy.load(str(TACT_DIR / "mission_onyxia_v1_propsets.bundle"))
@@ -622,77 +623,81 @@ def extract_onyxia_environment_glb():
             mfs_p[mf.m_GameObject.path_id] = mf.m_Mesh.path_id
     meshes_p = {o.path_id: o.read() for o in env_props.objects if o.type.name == "Mesh"}
 
-    spike_groups: Dict[int, Set[str]] = {}
-    for o in env_props.objects:
-        if o.type.name == "MeshRenderer":
-            mr = o.read()
-            gn = gos_p.get(mr.m_GameObject.path_id, "")
-            sb = getattr(mr, "m_StaticBatchInfo", None)
-            if sb and sb.subMeshCount > 0 and "SpikeRock" in gn:
-                mpid = mfs_p.get(mr.m_GameObject.path_id)
-                if mpid in meshes_p:
-                    m_obj = meshes_p[mpid]
-                    s = spike_groups.setdefault(mpid, set())
-                    for sub_i in range(sb.firstSubMesh, sb.firstSubMesh + sb.subMeshCount):
-                        s.add(f"{m_obj.m_Name}_{sub_i}")
+    # Pre-export & parse each Combined Mesh once (vertices are already in exact Unity world space)
+    parsed_cache: Dict[int, Dict[str, Dict[str, Any]]] = {}
+    for mpid, m_obj in meshes_p.items():
+        parts = parse_obj_groups(
+            m_obj.export(),
+            transform_fn=lambda p, n: unity_obj_to_three(p, n, 0.0, 0.0, 0.0),
+        )
+        parsed_cache[mpid] = {part["name"]: part for part in parts}
 
-    entries = []
-    scene_parts = [
-        ("Onyxia_Terrain_Mesh", (-5.0, 0.0, -5.0), "Onyxia_Tex_StoneTerrain_Color", None, None, 0.92, 1024),
+    node_parts: Dict[str, List[Dict[str, Any]]] = {}
+    for o in env_props.objects:
+        if o.type.name != "MeshRenderer":
+            continue
+        mr = o.read()
+        sb = getattr(mr, "m_StaticBatchInfo", None)
+        if not sb or sb.subMeshCount <= 0:
+            continue
+        mpid = mfs_p.get(mr.m_GameObject.path_id)
+        if mpid not in meshes_p or not getattr(mr, "m_Materials", None):
+            continue
+
+        m_obj = meshes_p[mpid]
+        gname = gos_p.get(mr.m_GameObject.path_id, "")
+        mat_name = mats.get(mr.m_Materials[0].path_id, "")
+        target_node = None
+        if mat_name == "Onyxia_Mat_Terrain":
+            target_node = "Onyxia_Terrain_Mesh"
+        elif mat_name == "Onyxia_Mat_RockWall":
+            target_node = "Onyxia_RockWall_Mesh"
+        elif mat_name == "Onyxia_Mat_Unwalkable":
+            target_node = gname if gname.startswith("Onyxia_Unwalkable") else "Onyxia_Unwalkable_Misc"
+        elif mat_name == "Onyxia_Mat_SpikeRocks":
+            target_node = "Onyxia_SpikeRocks"
+
+        if not target_node:
+            continue
+        by_group = parsed_cache[mpid]
+        for sub_i in range(sb.firstSubMesh, sb.firstSubMesh + sb.subMeshCount):
+            part = by_group.get(f"{m_obj.m_Name}_{sub_i}")
+            if part:
+                node_parts.setdefault(target_node, []).append(part)
+
+    ordered_nodes = [
+        ("Onyxia_Terrain_Mesh", "Onyxia_Tex_StoneTerrain_Color", None, None, 0.92, 1024),
         (
             "Onyxia_RockWall_Mesh",
-            (0.087, 7.282, 44.3),
             "Onyxia_Tex_RockWall_Color",
             "Onyxia_Tex_RockWall_Emissive",
             [1.65, 0.55, 0.14],
             0.88,
             1024,
         ),
-        ("Onyxia_Unwalkable01_Mesh", (9.65, 0.29, 15.806), "Onyxia_Tex_Unwalkables_Color", None, None, 0.9, 512),
-        ("Onyxia_Unwalkable02_Mesh", (-10.135, 0.167, 22.381), "Onyxia_Tex_Unwalkables_Color", None, None, 0.9, 512),
-        ("Onyxia_Unwalkable03_Mesh", (1.827, 0.133, 38.226), "Onyxia_Tex_Unwalkables_Color", None, None, 0.9, 512),
-        ("Onyxia_Unwalkable04_Mesh", (-2.624, 0.193, 56.401), "Onyxia_Tex_Unwalkables_Color", None, None, 0.9, 512),
+        ("Onyxia_Unwalkable01_Mesh", "Onyxia_Tex_Unwalkables_Color", None, None, 0.90, 512),
+        ("Onyxia_Unwalkable02_Mesh", "Onyxia_Tex_Unwalkables_Color", None, None, 0.90, 512),
+        ("Onyxia_Unwalkable03_Mesh", "Onyxia_Tex_Unwalkables_Color", None, None, 0.90, 512),
+        ("Onyxia_Unwalkable04_Mesh", "Onyxia_Tex_Unwalkables_Color", None, None, 0.90, 512),
+        ("Onyxia_SpikeRocks", "Onyxia_Tex_SpikeRocks_Color", None, None, 0.90, 1024),
     ]
-    for mname, (px, py, pz), color_tex, em_tex, em_fac, rough, tsize in scene_parts:
-        m = meshes[mname]
-        parsed = parse_obj_groups(
-            m.export(),
-            transform_fn=lambda p, n, px=px, py=py, pz=pz: unity_obj_to_three(p, n, px, py, pz),
-        )
-        geom = merge_parts_geometry(parsed)
+
+    entries = []
+    for nname, color_tex, em_tex, em_fac, rough, tsize in ordered_nodes:
+        parts = node_parts.get(nname)
+        if not parts:
+            raise RuntimeError(f"Missing baked static batch submeshes for {nname}")
         entries.append(
             {
-                "name": mname,
-                "geom": geom,
+                "name": nname,
+                "geom": merge_parts_geometry(parts),
                 "base_color_img": textures[color_tex],
                 "emissive_img": textures[em_tex] if em_tex else None,
                 "emissive_factor": em_fac,
                 "roughness": rough,
                 "metallic": 0.05,
                 "tex_size": tsize,
-                "jpeg_quality": 85,
-            }
-        )
-
-    spike_parts = []
-    for mpid, gnames in spike_groups.items():
-        m_obj = meshes_p[mpid]
-        parsed = parse_obj_groups(
-            m_obj.export(),
-            transform_fn=lambda p, n: unity_obj_to_three(p, n, 0.0, 0.0, 0.0),
-            only_groups=gnames,
-        )
-        spike_parts.extend(parsed)
-    if spike_parts:
-        entries.append(
-            {
-                "name": "Onyxia_SpikeRocks",
-                "geom": merge_parts_geometry(spike_parts),
-                "base_color_img": textures["Onyxia_Tex_SpikeRocks_Color"],
-                "roughness": 0.9,
-                "metallic": 0.05,
-                "tex_size": 512,
-                "jpeg_quality": 84,
+                "jpeg_quality": 90,
             }
         )
 
@@ -1198,6 +1203,10 @@ def extract_combathud_sprites():
 def main():
     if not TACT_DIR.exists():
         raise FileNotFoundError(f"TACT bundle directory not found: {TACT_DIR}")
+    if "--env-only" in sys.argv:
+        extract_onyxia_environment_glb()
+        print("\nRe-extracted Onyxia baked 3D environment cleanly!")
+        return
     extract_mission_data()
     extract_onyxia_environment_glb()
     poi_manifest = extract_poi_and_special_glbs()

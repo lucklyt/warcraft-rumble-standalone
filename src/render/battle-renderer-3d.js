@@ -62,12 +62,11 @@ export class BattleRenderer3D {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x12090c);
-    this.scene.fog = new THREE.FogExp2(0x140a0d, 0.0052);
+    this.scene.background = new THREE.Color(0x9e1102);
 
-    this.camera = new THREE.PerspectiveCamera(38, 9 / 16, 1.0, 280);
-    this.focusZ = 4;
-    this.targetFocusZ = 4;
+    this.camera = new THREE.PerspectiveCamera(28, 9 / 16, 2.0, 320);
+    this.focusZ = 10.5;
+    this.targetFocusZ = 10.5;
     this._loadedBossGlb = null;
 
     this._raycaster = new THREE.Raycaster();
@@ -122,52 +121,38 @@ export class BattleRenderer3D {
   }
 
   _setupLighting() {
-    const hemi = new THREE.HemisphereLight(0xffdcb8, 0x3b1815, 0.95);
+    const hemi = new THREE.HemisphereLight(0xfff1dc, 0x6b2718, 1.35);
     this.scene.add(hemi);
 
-    const keyLight = new THREE.DirectionalLight(0xffe0b2, 1.9);
-    keyLight.position.set(18, 46, 26);
+    const keyLight = new THREE.DirectionalLight(0xffe9d2, 1.4);
+    keyLight.position.set(16, 60, 24);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 2048;
     keyLight.shadow.mapSize.height = 2048;
     keyLight.shadow.camera.near = 5;
-    keyLight.shadow.camera.far = 140;
-    keyLight.shadow.camera.left = -36;
-    keyLight.shadow.camera.right = 36;
-    keyLight.shadow.camera.top = 90;
-    keyLight.shadow.camera.bottom = -20;
+    keyLight.shadow.camera.far = 160;
+    keyLight.shadow.camera.left = -42;
+    keyLight.shadow.camera.right = 42;
+    keyLight.shadow.camera.top = 96;
+    keyLight.shadow.camera.bottom = -24;
     keyLight.shadow.bias = -0.0008;
     this.scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0x93c5fd, 0.72);
-    rimLight.position.set(-24, 30, -85);
+    const rimLight = new THREE.DirectionalLight(0xbae6fd, 0.55);
+    rimLight.position.set(-20, 36, -80);
     this.scene.add(rimLight);
-
-    const lavaPoints = [
-      [9.6, 2.2, -16.0],
-      [-10.1, 2.2, -22.4],
-      [1.8, 2.2, -38.2],
-      [-2.6, 2.2, -56.4],
-      [0.0, 7.5, -75.0],
-    ];
     this._lavaLights = [];
-    for (const [lx, ly, lz] of lavaPoints) {
-      const pl = new THREE.PointLight(0xff5a1f, 18, 34, 1.5);
-      pl.position.set(lx, ly, lz);
-      this.scene.add(pl);
-      this._lavaLights.push(pl);
-    }
   }
 
   _setupLavaAndEmbers() {
-    const lavaGeo = new THREE.PlaneGeometry(130, 175, 1, 1);
-    lavaGeo.rotateX(-Math.PI / 2);
+    const chasmGeo = new THREE.PlaneGeometry(180, 240, 1, 1);
+    chasmGeo.rotateX(-Math.PI / 2);
 
     this._lavaUniforms = {
       uTime: { value: 0 },
     };
 
-    const lavaMat = new THREE.ShaderMaterial({
+    const chasmMat = new THREE.ShaderMaterial({
       uniforms: this._lavaUniforms,
       vertexShader: `
         varying vec2 vUv;
@@ -179,63 +164,35 @@ export class BattleRenderer3D {
       fragmentShader: `
         uniform float uTime;
         varying vec2 vUv;
-        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-        float noise(vec2 p) {
-          vec2 i = floor(p);
-          vec2 f = fract(p);
-          f = f * f * (3.0 - 2.0 * f);
-          return mix(
-            mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-            mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x),
-            f.y
-          );
-        }
-        float fbm(vec2 p) {
-          float v = 0.0;
-          float a = 0.5;
-          for (int i = 0; i < 4; i++) {
-            v += a * noise(p);
-            p *= 2.04;
-            a *= 0.5;
-          }
-          return v;
-        }
         void main() {
-          vec2 uv = vUv * vec2(10.0, 14.0);
-          float q = fbm(uv + vec2(uTime * 0.06, -uTime * 0.04));
-          float n = fbm(uv + 2.2 * q + vec2(-uTime * 0.05, uTime * 0.07));
-          vec3 crust = vec3(0.24, 0.03, 0.01);
-          vec3 magma = vec3(1.15, 0.30, 0.02);
-          vec3 hot = vec3(1.55, 0.78, 0.14);
-          vec3 col = mix(crust, magma, smoothstep(0.32, 0.62, n));
-          col = mix(col, hot, smoothstep(0.64, 0.85, n));
+          float pulse = 0.04 * sin(uTime * 0.9 + vUv.y * 8.0);
+          vec3 col = vec3(0.62 + pulse, 0.075 + pulse * 0.4, 0.012);
           gl_FragColor = vec4(col, 1.0);
         }
       `,
     });
 
-    const lavaMesh = new THREE.Mesh(lavaGeo, lavaMat);
-    lavaMesh.position.set(0, -1.35, -39);
-    this.envGroup.add(lavaMesh);
+    const chasmMesh = new THREE.Mesh(chasmGeo, chasmMat);
+    chasmMesh.position.set(0, -2.85, -39);
+    this.envGroup.add(chasmMesh);
 
-    // Rising glowing ember particles
-    const emberCount = 160;
+    const emberCount = 65;
     const pos = new Float32Array(emberCount * 3);
     this._emberSeeds = new Float32Array(emberCount * 2);
     for (let i = 0; i < emberCount; i++) {
-      pos[i * 3 + 0] = (Math.random() - 0.5) * 60;
-      pos[i * 3 + 1] = Math.random() * 14;
-      pos[i * 3 + 2] = -Math.random() * 96 + 10;
-      this._emberSeeds[i * 2 + 0] = 0.6 + Math.random() * 1.6;
+      pos[i * 3 + 0] = (Math.random() - 0.5) * 64;
+      pos[i * 3 + 1] = Math.random() * 12;
+      pos[i * 3 + 2] = -Math.random() * 98 + 10;
+      this._emberSeeds[i * 2 + 0] = 0.4 + Math.random() * 0.9;
       this._emberSeeds[i * 2 + 1] = Math.random() * Math.PI * 2;
     }
     const emberGeo = new THREE.BufferGeometry();
     emberGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     const emberMat = new THREE.PointsMaterial({
-      color: 0xffa040,
-      size: 0.42,
+      color: 0xffb36b,
+      size: 0.28,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.42,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -284,6 +241,30 @@ export class BattleRenderer3D {
       const tpl = await loadGlbTemplate(envUrl);
       if (this.disposed) return;
       const envClone = tpl.clone(true);
+      // Convert static baked Blizzard meshes to true-color MeshBasicMaterial matching real gameplay look
+      envClone.traverse((child) => {
+        if (child.isMesh && child.material) {
+          const oldMat = child.material;
+          if (child.name === 'Onyxia_RockWall_Mesh') {
+            child.material = new THREE.MeshStandardMaterial({
+              map: oldMat.map || null,
+              emissiveMap: oldMat.emissiveMap || null,
+              emissive: new THREE.Color(0xd93008),
+              emissiveIntensity: 0.95,
+              roughness: 1.0,
+              metalness: 0.0,
+            });
+          } else {
+            child.material = new THREE.MeshBasicMaterial({
+              map: oldMat.map || null,
+              color: 0xffffff,
+              side: THREE.FrontSide,
+            });
+          }
+          child.receiveShadow = false;
+          child.castShadow = false;
+        }
+      });
       this.envGroup.add(envClone);
     } catch (err) {
       console.warn('Failed to load Onyxia 3D environment:', err);
@@ -336,7 +317,7 @@ export class BattleRenderer3D {
   }
 
   setFocusZ(z) {
-    this.targetFocusZ = Math.max(2, Math.min(76, z));
+    this.targetFocusZ = Math.max(9, Math.min(68, z));
   }
 
   panByDeltaZ(dz) {
@@ -349,10 +330,13 @@ export class BattleRenderer3D {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const needW = Math.round(w * dpr);
     const needH = Math.round(h * dpr);
-    if (this.canvas.width !== needW || this.canvas.height !== needH) {
+    const aspect = w / Math.max(1, h);
+    const targetFov = Math.min(48, Math.max(28, (2 * Math.atan(21.0 / (88 * aspect)) * 180) / Math.PI));
+    if (this.canvas.width !== needW || this.canvas.height !== needH || Math.abs(this.camera.fov - targetFov) > 0.05) {
       this.renderer.setPixelRatio(dpr);
       this.renderer.setSize(w, h, false);
-      this.camera.aspect = w / Math.max(1, h);
+      this.camera.aspect = aspect;
+      this.camera.fov = targetFov;
       this.camera.updateProjectionMatrix();
     }
     return { w, h };
@@ -413,8 +397,8 @@ export class BattleRenderer3D {
     const shakeX = shakeAmt > 0 ? Math.sin(this._time * 47) * shakeAmt : 0;
     const shakeY = shakeAmt > 0 ? Math.cos(this._time * 39) * shakeAmt * 0.6 : 0;
 
-    this.camera.position.set(shakeX, 46 + shakeY, -this.focusZ + 18.5);
-    this.camera.lookAt(shakeX * 0.35, 0, -this.focusZ - 2.5);
+    this.camera.position.set(shakeX, 88 + shakeY, -this.focusZ + 17.0);
+    this.camera.lookAt(shakeX * 0.35, 0, -this.focusZ - 0.5);
 
     if (sim.mission?.bossGlb && sim.mission.bossGlb !== this._loadedBossGlb) {
       this._loadBossModel(sim.mission.bossGlb, sim.mission.bossScale || 2.35);
@@ -466,22 +450,9 @@ export class BattleRenderer3D {
         }
         const grp = new THREE.Group();
         grp.position.set(s.x, 0, -s.z);
-        // Reconstruction ring
-        const ringGeo = new THREE.RingGeometry(2.6, 3.1, 32);
-        ringGeo.rotateX(-Math.PI / 2);
-        const ringMat = new THREE.MeshBasicMaterial({
-          color: s.team === 'player' ? 0x38bdf8 : 0xef4444,
-          transparent: true,
-          opacity: 0.6,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-        });
-        const teamRing = new THREE.Mesh(ringGeo, ringMat);
-        teamRing.position.y = 0.08;
-        grp.add(teamRing);
 
         this.structuresGroup.add(grp);
-        rec = { key: desiredKey, group: grp, loading: true, model: null, ragDome: null, ragModel: null, ringMat };
+        rec = { key: desiredKey, group: grp, loading: true, model: null, ragDome: null, ragModel: null };
         this._structureMeshes.set(s.id, rec);
 
         const poiKey = s.kind === 'base' ? 'player-keep' : s.team === 'player' ? 'tower-player' : 'tower-enemy';
@@ -507,8 +478,6 @@ export class BattleRenderer3D {
       const sinkY = s.rebuilding ? -2.4 * (s.rebuildTimer / 2.5) : 0;
       rec.group.position.set(s.x, sinkY, -s.z);
       rec.group.visible = s.hp > 0 || s.rebuilding;
-      rec.ringMat.color.setHex(s.team === 'player' ? 0x38bdf8 : 0xef4444);
-      rec.ringMat.opacity = s.rebuilding ? 0.35 + 0.3 * Math.sin(this._time * 10) : 0.65;
 
       if (rec.model) {
         const flash = s.hitFlashTimer > 0;
@@ -556,49 +525,30 @@ export class BattleRenderer3D {
         grp.position.set(m.x, 0, -m.z);
         this.minesGroup.add(grp);
 
-        // 3 golden crystal nuggets indicating remaining gold stacks (0..3)
-        const crystals = [];
-        const cryGeo = new THREE.OctahedronGeometry(0.42, 0);
-        const cryMat = new THREE.MeshStandardMaterial({
-          color: 0xfacc15,
-          emissive: 0xd97706,
-          emissiveIntensity: 0.85,
-          metalness: 0.65,
-          roughness: 0.25,
-        });
-        const offsets = [
-          [-1.1, 0.5, 1.1],
-          [1.0, 0.45, 1.2],
-          [0.0, 0.55, 1.65],
-        ];
-        for (const [ox, oy, oz] of offsets) {
-          const mesh = new THREE.Mesh(cryGeo, cryMat);
-          mesh.position.set(ox, oy, oz);
-          grp.add(mesh);
-          crystals.push(mesh);
-        }
-
-        rec = { group: grp, crystals };
+        rec = { group: grp, model: null };
         this._mineMeshes.set(m.id, rec);
 
         const url = this.manifest.poi?.['gold-mine']?.glb;
         if (url) {
           loadGlbTemplate(url).then((tpl) => {
             if (this.disposed) return;
-            const model = tpl.clone(true);
+            const model = cloneSceneWithUniqueMaterials(tpl);
             model.rotation.y = m.x < 0 ? 0.5 : -0.5;
             grp.add(model);
+            rec.model = model;
           });
         }
       }
 
-      rec.crystals.forEach((c, idx) => {
-        c.visible = idx < m.gold;
-        if (c.visible) {
-          c.rotation.y = this._time * 1.4 + idx;
-          c.position.y = 0.5 + Math.sin(this._time * 2.5 + idx) * 0.1;
+      if (rec.model) {
+        const depleted = (m.gold || 0) <= 0;
+        rec.model.scale.setScalar(depleted ? 0.88 : 1.0);
+        for (const mat of rec.model.userData?.ownedMaterials || []) {
+          if (mat.color) {
+            mat.color.setHex(depleted ? 0x9ca3af : 0xffffff);
+          }
         }
-      });
+      }
     }
   }
 
@@ -635,21 +585,8 @@ export class BattleRenderer3D {
         grp.position.set(sw.x, 0.06, -sw.z);
         this.switchesGroup.add(grp);
 
-        const ringGeo = new THREE.RingGeometry(1.75, 2.05, 28);
-        ringGeo.rotateX(-Math.PI / 2);
-        const ringMat = new THREE.MeshBasicMaterial({
-          color: 0xfacc15,
-          transparent: true,
-          opacity: 0.72,
-          side: THREE.DoubleSide,
-          depthWrite: false,
-        });
-        const ring = new THREE.Mesh(ringGeo, ringMat);
-        ring.position.y = 0.04;
-        grp.add(ring);
-
         const arrowHolder = new THREE.Group();
-        arrowHolder.position.y = 0.36;
+        arrowHolder.position.y = 0.22;
         grp.add(arrowHolder);
 
         rec = { group: grp, arrowHolder, curYaw: 0 };
@@ -664,7 +601,14 @@ export class BattleRenderer3D {
         }
         if (arrowUrl) {
           loadGlbTemplate(arrowUrl).then((tpl) => {
-            if (!this.disposed) arrowHolder.add(tpl.clone(true));
+            if (this.disposed) return;
+            const arrow = cloneSceneWithUniqueMaterials(tpl);
+            arrow.traverse((ch) => {
+              if (ch.isMesh && ch.material) {
+                ch.material = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+              }
+            });
+            arrowHolder.add(arrow);
           });
         }
       }
@@ -1005,7 +949,7 @@ export class BattleRenderer3D {
       return;
     }
 
-    const pulse = 0.22 + 0.1 * Math.sin(this._time * 6);
+    const pulse = 0.44 + 0.04 * Math.sin(this._time * 5);
     const zones = !spec.isSpell && !spec.isUnbound && spec.slug !== 'ragnaros' ? getPlayerDeployZones(sim) : [];
     const friendlyKey = (sim.structures || [])
       .filter((s) => s.team === 'player' && s.hp > 0 && !s.rebuilding)
@@ -1021,23 +965,24 @@ export class BattleRenderer3D {
           const planeGeo = new THREE.PlaneGeometry(da.width, da.depth);
           planeGeo.rotateX(-Math.PI / 2);
           const planeMat = new THREE.MeshBasicMaterial({
-            color: 0x22d3ee,
+            color: 0x2685f4,
             transparent: true,
             opacity: pulse,
             side: THREE.DoubleSide,
             depthWrite: false,
           });
           const mesh = new THREE.Mesh(planeGeo, planeMat);
-          mesh.position.set(da.x, 0.1, -da.z);
+          mesh.position.set(da.x, 0.12, -da.z);
           mesh.userData.isDeployFill = true;
           this.deployGridGroup.add(mesh);
 
           const edges = new THREE.EdgesGeometry(planeGeo);
           const line = new THREE.LineSegments(
             edges,
-            new THREE.LineBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.85 })
+            new THREE.LineBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.94 })
           );
           line.position.copy(mesh.position);
+          line.position.y = 0.14;
           this.deployGridGroup.add(line);
         }
       } else if (spec.slug === 'ragnaros') {

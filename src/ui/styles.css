@@ -1683,10 +1683,20 @@ button {
 }
 
 /* ==============================
-   BATTLE SCREEN & AUTHENTIC COMBAT HUD
+   BATTLE SCREEN & AUTHENTIC COMBAT HUD (1:1 YouTube Gameplay Match)
    ============================== */
+.wr-phone-backdrop.battle-backdrop {
+  background: #0d0302;
+}
+
 .wr-phone-shell.battle-shell {
-  background: #0f0709;
+  width: 100vw;
+  max-width: 980px;
+  height: 100dvh;
+  max-height: 100dvh;
+  border-radius: 0;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+  background: #9e1102;
 }
 
 .wr-battle-canvas-3d {
@@ -1706,50 +1716,71 @@ button {
   z-index: 6;
 }
 
+/* World-space crisp level numbers & conditional HP bars (real_onyxia_02.jpg) */
 .wr-world-hp {
   position: absolute;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
 }
 
-.wr-world-hp .lv-badge {
-  min-width: 16px;
-  height: 16px;
-  padding: 0 3px;
-  border-radius: 4px;
-  background: #0f172a;
-  border: 1.5px solid #38bdf8;
+.wr-world-hp .lv-num {
   font-family: var(--font-numbers);
-  font-size: 9px;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow:
+    -1.2px -1.2px 0 #000,
+     1.2px -1.2px 0 #000,
+    -1.2px  1.2px 0 #000,
+     1.2px  1.2px 0 #000,
+     0      2px   2px rgba(0, 0, 0, 0.9);
   line-height: 1;
 }
 
-.wr-world-hp.enemy .lv-badge {
-  border-color: #ef4444;
+.wr-world-hp.full .bar {
+  display: none;
 }
 
-.wr-world-hp .bar {
-  width: 36px;
-  height: 6px;
-  border-radius: 3px;
+.wr-world-hp.damaged .bar {
+  display: block;
+  width: 34px;
+  height: 5px;
+  border-radius: 2px;
   background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid #000;
   overflow: hidden;
 }
 
-.wr-world-hp.struct .bar {
-  width: 66px;
-  height: 9px;
+.wr-world-hp.struct.damaged .bar {
+  width: 58px;
+  height: 7px;
+}
+
+.wr-world-hp.keep-wing {
+  padding: 2px 6px;
+}
+
+.wr-world-hp.keep-wing .wing-bg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 22px;
+  object-fit: contain;
+  z-index: -1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+
+.wr-world-hp.keep-wing .lv-num {
+  color: #fde68a;
+  font-size: 13px;
 }
 
 .wr-world-hp.player .fill {
   height: 100%;
-  background: linear-gradient(90deg, #38bdf8, #0284c7);
+  background: linear-gradient(90deg, #38bdf8, #2563eb);
 }
 
 .wr-world-hp.enemy .fill {
@@ -1765,85 +1796,123 @@ button {
 .wr-float-dmg {
   position: absolute;
   font-family: var(--font-numbers);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
-  text-shadow: 0 1.5px 2px #000, 1px 0 #000, -1px 0 #000;
+  text-shadow:
+    -1.2px -1.2px 0 #000,
+     1.2px -1.2px 0 #000,
+    -1.2px  1.2px 0 #000,
+     1.2px  1.2px 0 #000;
 }
 
-/* Top Combat Bar (matches battle-late.png) */
+/* Offscreen Enemy Portrait Bubbles */
+.wr-offscreen-bubbles {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.wr-offscreen-bubble {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 44px;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wr-offscreen-bubble .ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wr-offscreen-bubble .portrait {
+  position: relative;
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  margin-top: 3px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Compact Floating Top Combat Bar (matches real_onyxia_01.jpg 1:1) */
 .wr-combat-top {
   position: relative;
   z-index: 20;
-  padding: 6px 6px 4px;
+  width: min(96vw, 430px);
+  margin: 6px auto 0;
+  padding: 2px 6px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 6px;
-  background: linear-gradient(180deg, rgba(12, 10, 16, 0.92), rgba(12, 10, 16, 0.45));
+  gap: 5px;
 }
 
 .wr-combat-side {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0;
   min-width: 0;
+}
+
+.wr-combat-side.left .wr-medallion {
+  margin-right: -8px;
+  z-index: 3;
+}
+
+.wr-combat-side.right .wr-medallion {
+  margin-left: -8px;
+  z-index: 3;
 }
 
 .wr-medallion {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
 }
 
 .wr-medallion .avatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   margin: 4px;
   border-radius: 50%;
   object-fit: cover;
+  background: #111827;
 }
 
 .wr-medallion .frame {
   position: absolute;
   inset: 0;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   object-fit: contain;
-}
-
-.wr-medallion .lv {
-  position: absolute;
-  bottom: -2px;
-  left: -2px;
-  padding: 0 4px;
-  border-radius: 4px;
-  background: #0f172a;
-  border: 1.5px solid #38bdf8;
-  font-family: var(--font-numbers);
-  font-size: 10px;
-  color: #fff;
-}
-
-.wr-medallion.boss .lv {
-  left: auto;
-  right: -2px;
-  border-color: #ef4444;
 }
 
 .wr-boss-subbadges {
   position: absolute;
-  bottom: -16px;
-  right: 0;
+  bottom: -13px;
+  right: 2px;
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
 }
 
 .wr-boss-subbadges .phase {
-  padding: 1px 4px;
-  border-radius: 4px;
-  background: #991b1b;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: rgba(127, 29, 29, 0.9);
   border: 1px solid #f87171;
   font-family: var(--font-numbers);
   font-size: 9px;
@@ -1851,128 +1920,143 @@ button {
 }
 
 .wr-boss-subbadges .traits img {
-  width: 14px;
-  height: 14px;
-}
-
-.wr-bar-stack {
-  flex: 1;
-  min-width: 0;
-}
-
-.wr-bar-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: #e2e8f0;
-  margin-bottom: 2px;
-}
-
-.wr-bar-label strong {
-  font-family: var(--font-numbers);
-  color: #fff;
+  width: 13px;
+  height: 13px;
 }
 
 .wr-hp-bar-track {
   position: relative;
-  height: 14px;
-  border-radius: 5px;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1.5px solid #475569;
-  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  height: 18px;
+  border-radius: 4px;
+  background: #222530;
+  border: 2.5px solid #6b7280;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.7);
+  overflow: visible;
 }
 
 .wr-hp-bar-fill-img {
   height: 100%;
+  border-radius: 2px;
   object-fit: cover;
   display: block;
 }
 
-.wr-boss-notch {
+.wr-hp-bar-num {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: rgba(255, 255, 255, 0.85);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-numbers);
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 0 1px 2px #000;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.wr-hp-bar-track:hover .wr-hp-bar-num {
+  opacity: 1;
+}
+
+.wr-phase-tri {
+  position: absolute;
+  top: -7px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid #dc2626;
+  filter: drop-shadow(0 1px 1px #000);
 }
 
 .wr-combat-center {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 
 .wr-stone-timer {
-  min-width: 58px;
-  padding: 2px 7px;
-  border-radius: 7px;
-  background: linear-gradient(180deg, #3f3d4d, #23222d);
-  border: 1.5px solid #6b687d;
-  text-align: center;
+  min-width: 54px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #4b4e5c, #2d2f3a);
+  border: 2px solid #717485;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wr-stone-timer span {
-  display: block;
   font-family: var(--font-numbers);
-  font-size: 14px;
+  font-size: 15px;
   color: #fff;
-  line-height: 1.1;
+  text-shadow: 0 1.5px #000;
 }
 
 .wr-stone-timer span.overtime {
   color: #fb923c;
 }
 
-.wr-stone-timer small {
-  display: block;
-  font-size: 9px;
-  color: #cbd5e1;
-  line-height: 1.1;
-}
-
 .wr-orange-pause-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
-  background: linear-gradient(180deg, #fb923c, #ea580c);
-  border: 1.5px solid #fed7aa;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #f59e0b, #d97706);
+  border: 2px solid #fde68a;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .wr-orange-pause-btn img {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   object-fit: contain;
 }
 
-.wr-combat-quick-strip {
-  position: relative;
-  z-index: 18;
+/* Unobtrusive Top-Right Corner Controls */
+.wr-combat-aux {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 21;
   display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 2px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.wr-quick-pill {
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.78);
-  border: 1px solid rgba(148, 163, 184, 0.45);
+@media (max-width: 640px) {
+  .wr-combat-aux {
+    top: 48px;
+    flex-direction: row;
+  }
+}
+
+.wr-aux-pill {
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(17, 19, 28, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.4);
   font-size: 10px;
   color: #e2e8f0;
 }
 
-.wr-quick-pill.active {
+.wr-aux-pill.active {
   background: #0284c7;
   border-color: #7dd3fc;
   color: #fff;
 }
 
-.wr-quick-pill.danger {
-  border-color: rgba(248, 113, 113, 0.55);
+.wr-aux-pill.danger {
+  border-color: rgba(248, 113, 113, 0.5);
   color: #fca5a5;
 }
 
@@ -1981,9 +2065,9 @@ button {
   z-index: 16;
   margin: 6px auto 0;
   max-width: 90%;
-  padding: 5px 12px;
+  padding: 4px 12px;
   border-radius: 999px;
-  background: rgba(17, 13, 24, 0.88);
+  background: rgba(17, 13, 24, 0.85);
   border: 1.5px solid #f59e0b;
   font-size: 11px;
   color: #fef3c7;
@@ -2006,7 +2090,7 @@ button {
 .wr-minimap-wrap {
   position: absolute;
   right: 8px;
-  top: 96px;
+  top: 118px;
   z-index: 18;
   padding: 4px;
   border-radius: 8px;
@@ -2024,7 +2108,7 @@ button {
 
 .wr-offscreen-warn {
   position: absolute;
-  bottom: 186px;
+  bottom: 138px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 18;
@@ -2139,68 +2223,64 @@ button {
   text-shadow: 0 3px #7f1d1d, 1px 0 #7f1d1d, -1px 0 #7f1d1d;
 }
 
-/* Authentic Bottom Stone Card Tray (matches battle-late.png) */
+/* Authentic Centered Recessed Dark-Stone Tray (matches real_onyxia_01.jpg 1:1) */
 .wr-combat-bottom {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 4px;
+  width: min(98vw, 415px);
   z-index: 22;
-  padding: 6px 6px 8px;
-  background:
-    linear-gradient(180deg, rgba(48, 39, 34, 0.96) 0%, rgba(28, 22, 20, 0.98) 100%),
-    url('/r/authentic/combat-tray-wood.webp') center/cover no-repeat;
-  border-top: 3px solid #6b5344;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.78);
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .wr-combat-bottom.tray-hidden {
-  transform: translateY(115%);
+  transform: translateX(-50%) translateY(125%);
   pointer-events: none;
 }
 
-.wr-tray-cards-stage {
+.wr-tray-shell-inner {
   display: grid;
-  grid-template-columns: 64px 1fr;
+  grid-template-columns: 60px 1fr;
   gap: 6px;
   align-items: end;
-  margin-bottom: 6px;
 }
 
+/* Left Lower Step: Next Mini Unpainted Grey Statue */
 .wr-next-mini-pedestal {
   position: relative;
-  height: 98px;
+  height: 82px;
+  padding-bottom: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
-.wr-next-mini-pedestal .panel-bg {
+.wr-next-mini-pedestal .next-pedestal {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  bottom: 6px;
+  width: 52px;
+  height: 24px;
   object-fit: contain;
+  filter: grayscale(1) brightness(0.75);
 }
 
 .wr-next-mini-pedestal .next-fig {
   position: relative;
   z-index: 2;
-  width: 44px;
-  height: 44px;
-  margin-bottom: 10px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: -8px;
   object-fit: contain;
-  filter: grayscale(1) brightness(0.84) contrast(1.18);
+  filter: grayscale(1) brightness(0.84) contrast(1.18) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.85));
 }
 
 .wr-next-mini-pedestal .next-cost-badge {
   position: relative;
   z-index: 3;
   width: 24px;
-  height: 20px;
-  margin-top: -12px;
+  height: 19px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2212,6 +2292,7 @@ button {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  filter: grayscale(1) brightness(0.8);
 }
 
 .wr-next-mini-pedestal .next-cost-badge span {
@@ -2219,57 +2300,72 @@ button {
   z-index: 2;
   font-family: var(--font-numbers);
   font-size: 11px;
-  color: #1c1917;
+  color: #f3f4f6;
+  text-shadow: 0 1px #000;
 }
 
-.wr-next-mini-pedestal .next-tag {
-  position: relative;
-  z-index: 3;
-  font-size: 9px;
-  color: #d6d3d1;
-  margin-top: 2px;
+/* Main Carved Dark-Stone Box */
+.wr-stone-tray-box {
+  background: linear-gradient(180deg, #4d5160 0%, #313440 16%, #23252f 100%);
+  border: 2px solid #636778;
+  border-radius: 6px;
+  padding: 2px 6px 5px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.wr-tray-numbers-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin-bottom: 1px;
+}
+
+.wr-tray-numbers-bar span {
+  font-family: var(--font-numbers);
+  font-size: 10px;
+  color: #161820;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.14);
+  padding-left: 4px;
+  line-height: 1;
 }
 
 .wr-hand-pedestal-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 5px;
+  margin-bottom: 4px;
 }
 
 .wr-statue-slot {
   position: relative;
-  height: 102px;
+  height: 76px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  transition: transform 0.14s ease;
-}
-
-.wr-statue-slot.selected {
-  transform: translateY(-9px) scale(1.06);
-  z-index: 5;
+  border-radius: 5px;
+  transition: transform 0.12s ease;
 }
 
 .wr-statue-slot .slot-hole {
   position: absolute;
-  bottom: 4px;
-  width: 92%;
-  height: 44px;
-  object-fit: contain;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
 .wr-statue-slot .slot-pedestal {
   position: absolute;
-  bottom: 10px;
-  width: 84%;
-  height: 42px;
+  bottom: 8px;
+  width: 82%;
+  height: 30px;
   object-fit: contain;
   z-index: 2;
 }
 
-.wr-statue-slot .slot-ready-ring,
-.wr-statue-slot .slot-glow {
+.wr-statue-slot .slot-ready-ring {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -2283,16 +2379,11 @@ button {
   opacity: 0.72;
 }
 
-.wr-statue-slot.selected .slot-glow {
-  opacity: 1;
-  filter: drop-shadow(0 0 10px #22d3ee);
-}
-
 .wr-statue-slot .slot-crown {
   position: absolute;
-  top: 0;
-  width: 24px;
-  height: 20px;
+  top: -6px;
+  width: 22px;
+  height: 18px;
   z-index: 5;
   object-fit: contain;
 }
@@ -2300,16 +2391,15 @@ button {
 .wr-statue-slot .slot-fig {
   position: relative;
   z-index: 4;
-  width: 72px;
-  height: 70px;
-  margin-bottom: 18px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 11px;
   object-fit: contain;
-  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.85));
-  transition: filter 0.15s ease;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.9));
 }
 
 .wr-statue-slot.unaffordable .slot-fig {
-  filter: grayscale(1) brightness(0.78) contrast(1.2);
+  filter: grayscale(1) brightness(0.75) contrast(1.22);
 }
 
 .wr-statue-slot .slot-bottom-badges {
@@ -2320,13 +2410,12 @@ button {
   align-items: center;
   justify-content: center;
   gap: 3px;
-  margin-bottom: 2px;
 }
 
 .wr-statue-slot .slot-cost {
   position: relative;
-  width: 28px;
-  height: 22px;
+  width: 26px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2340,10 +2429,6 @@ button {
   object-fit: contain;
 }
 
-.wr-statue-slot.unaffordable .slot-cost img {
-  filter: grayscale(1) brightness(0.75);
-}
-
 .wr-statue-slot .slot-cost span {
   position: relative;
   z-index: 2;
@@ -2353,25 +2438,38 @@ button {
 }
 
 .wr-statue-slot .slot-tal {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
   border: 1.5px solid #cbd5e1;
   object-fit: cover;
+}
+
+/* Selected state matches real_onyxia_01.jpg Slot 1: empty dark recessed alcove! */
+.wr-statue-slot.selected {
+  box-shadow: inset 0 0 0 2px #38bdf8, 0 0 10px rgba(56, 189, 248, 0.55);
+}
+
+.wr-statue-slot.selected .slot-pedestal,
+.wr-statue-slot.selected .slot-ready-ring,
+.wr-statue-slot.selected .slot-crown,
+.wr-statue-slot.selected .slot-fig,
+.wr-statue-slot.selected .slot-bottom-badges {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.8);
 }
 
 /* 10-Ingot Gold Bar */
 .wr-gold-hud-authentic {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 2px 4px 0;
+  gap: 6px;
 }
 
 .wr-gold-plaque {
   position: relative;
-  width: 40px;
-  height: 32px;
+  width: 34px;
+  height: 28px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -2390,7 +2488,7 @@ button {
   position: relative;
   z-index: 2;
   font-family: var(--font-numbers);
-  font-size: 18px;
+  font-size: 16px;
   color: #1c1917;
 }
 
@@ -2398,15 +2496,15 @@ button {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  gap: 4px;
+  gap: 3px;
 }
 
 .wr-gold-pocket {
   position: relative;
-  height: 20px;
-  border-radius: 4px;
-  background: #141112;
-  border: 1.5px solid #443933;
+  height: 18px;
+  border-radius: 999px;
+  background: #14161c;
+  border: 1.5px solid #3c3f4c;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -2418,14 +2516,14 @@ button {
   left: 0;
   top: 0;
   bottom: 0;
-  background: linear-gradient(90deg, #f59e0b, #fde047);
+  background: linear-gradient(90deg, #ea580c, #facc15);
 }
 
 .wr-gold-pocket-nugget {
   position: relative;
   z-index: 2;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   object-fit: contain;
 }
 

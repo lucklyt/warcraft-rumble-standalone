@@ -109,66 +109,60 @@ export class BattleController {
     const bossLv = this.mission?.level || 30;
 
     this.root.innerHTML = `
-      <div class="wr-phone-backdrop">
+      <div class="wr-phone-backdrop battle-backdrop">
         <div class="wr-phone-shell battle-shell" id="wr-stage">
           <canvas id="wr-battle-canvas" class="wr-battle-canvas-3d"></canvas>
           <div id="wr-world-overlays" class="wr-world-overlays"></div>
+          <div id="wr-offscreen-bubbles" class="wr-offscreen-bubbles"></div>
 
-          <!-- 1. Authentic Top Combat Bar (matches battle-late.png) -->
-          <div class="wr-hud-top wr-combat-top" id="wr-combat-top">
-            <!-- Player Side -->
+          <!-- 1. Compact Floating Top Combat Bar (matches real_onyxia_01.jpg 1:1) -->
+          <div class="wr-combat-top" id="wr-combat-top">
+            <!-- Player Medallion + Blue Keep Bar -->
             <div class="wr-combat-side left">
-              <div class="wr-medallion player">
+              <div class="wr-medallion player" title="我方主基地 (Lv.${playerLv})">
                 <img class="avatar" src="${esc(playerLeaderImg)}" alt="主将" />
                 <img class="frame" src="./r/hud/CombatHUD_Tex_AvatarFrame.webp" alt="" />
-                <span class="lv">${playerLv}</span>
               </div>
-              <div class="wr-bar-stack">
-                <div class="wr-bar-label"><span>我方基地</span><strong id="wr-base-hp-text">5,800</strong></div>
-                <div class="wr-hp-bar-track player">
-                  <img id="wr-base-hp-fill" class="wr-hp-bar-fill-img" src="./r/hud/CombatHUD_Tex_PlayerPanel_MeterFill.webp" alt="" style="width:100%;" />
-                </div>
+              <div class="wr-hp-bar-track player" title="我方基地血量">
+                <img id="wr-base-hp-fill" class="wr-hp-bar-fill-img" src="./r/hud/CombatHUD_Tex_PlayerPanel_MeterFill.webp" alt="" style="width:100%;" />
+                <span id="wr-base-hp-text" class="wr-hp-bar-num">5,800</span>
               </div>
             </div>
 
-            <!-- Center Timer & Pause -->
+            <!-- Center Timer & Orange Pause Button -->
             <div class="wr-combat-center">
               <div class="wr-stone-timer">
                 <span id="wr-match-timer">6:00</span>
-                <small id="wr-egg-timer">${isOnyxia ? '龙蛋 0:20' : esc(this.mission?.zoneZh || '')}</small>
               </div>
-              <button type="button" class="wr-orange-pause-btn" id="wr-pause-btn" title="暂停与战术菜单 (Space)">
+              <button type="button" class="wr-orange-pause-btn" id="wr-pause-btn" title="暂停菜单 (Space)">
                 <img src="./r/hud/CombatHUD_Tex_IconPause.webp" alt="暂停" />
               </button>
             </div>
 
-            <!-- Boss Side -->
+            <!-- Boss Red HP Bar (with 2 phase markers at 40% & 70%) + Boss Medallion -->
             <div class="wr-combat-side right">
-              <div class="wr-bar-stack">
-                <div class="wr-bar-label"><strong id="wr-boss-hp-text">18,000</strong><span>${esc(this.mission?.nameZh || '首领')}</span></div>
-                <div class="wr-hp-bar-track enemy">
-                  <img id="wr-boss-hp-fill" class="wr-hp-bar-fill-img" src="./r/hud/CombatHUD_Tex_PlayerPanel_MeterFill_Enemy.webp" alt="" style="width:100%;" />
-                  ${isOnyxia ? `<div class="wr-boss-notch" style="left:40%;"></div><div class="wr-boss-notch" style="left:70%;"></div>` : ''}
-                </div>
+              <div class="wr-hp-bar-track enemy" title="${esc(this.mission?.nameZh || '首领')} (Lv.${bossLv})">
+                <img id="wr-boss-hp-fill" class="wr-hp-bar-fill-img" src="./r/hud/CombatHUD_Tex_PlayerPanel_MeterFill_Enemy.webp" alt="" style="width:100%;" />
+                ${isOnyxia ? `<div class="wr-phase-tri" style="left:40%;"></div><div class="wr-phase-tri" style="left:70%;"></div>` : ''}
+                <span id="wr-boss-hp-text" class="wr-hp-bar-num">18,000</span>
               </div>
               <div class="wr-medallion boss">
                 <img id="wr-boss-mood" class="avatar" src="${esc(bossPortrait)}" alt="${esc(this.mission?.nameZh)}" />
                 <img class="frame" src="./r/hud/CombatHUD_Tex_AvatarFrame.webp" alt="" />
-                <span class="lv">${bossLv}</span>
                 <div class="wr-boss-subbadges">
-                  <span id="wr-boss-phase-badge" class="phase">${isOnyxia ? 'P1' : 'BOSS'}</span>
+                  <span id="wr-boss-phase-badge" class="phase">${isOnyxia ? 'P1' : ''}</span>
                   <span id="wr-boss-traits" class="traits"></span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Compact Floating Tactical Pills (AI Auto / Speed / MapCam) -->
-          <div class="wr-combat-quick-strip">
-            <button type="button" class="wr-quick-pill" id="wr-auto-btn">AI 托管</button>
-            <button type="button" class="wr-quick-pill" id="wr-speed-btn">1x</button>
-            <button type="button" class="wr-quick-pill" id="wr-cam-btn">切换小地图</button>
-            <button type="button" class="wr-quick-pill danger" id="wr-exit-btn">撤退</button>
+          <!-- Unobtrusive Corner Tactical Controls -->
+          <div class="wr-combat-aux" id="wr-combat-aux">
+            <button type="button" class="wr-aux-pill" id="wr-auto-btn">AI 托管</button>
+            <button type="button" class="wr-aux-pill" id="wr-speed-btn">1x</button>
+            <button type="button" class="wr-aux-pill" id="wr-cam-btn">小地图</button>
+            <button type="button" class="wr-aux-pill danger" id="wr-exit-btn">撤退</button>
           </div>
 
           <div id="wr-boss-taunt" class="wr-boss-taunt" style="display:none;"></div>
@@ -203,40 +197,42 @@ export class BattleController {
             </button>
           </div>
 
-          <!-- 3. Authentic Bottom Stone Card Tray (slides up on Start, matches battle-late.png) -->
-          <div class="wr-hud-bottom wr-combat-bottom tray-hidden" id="wr-combat-bottom">
-            <div class="wr-tray-wood-bg"></div>
-            <div class="wr-tray-cards-stage">
-              <!-- Next Mini Pedestal on Left -->
+          <!-- 3. Authentic Recessed Stone Card Tray (matches real_onyxia_01.jpg 1:1) -->
+          <div class="wr-combat-bottom tray-hidden" id="wr-combat-bottom">
+            <div class="wr-tray-shell-inner">
+              <!-- Left Lower Step: Next Mini Unpainted Stone Statue -->
               <div class="wr-next-mini-pedestal" id="wr-next-panel">
-                <img class="panel-bg" src="./r/hud/CombatHUD_Tex_Tray_NextPanel.webp" alt="" />
+                <img class="next-pedestal" src="./r/authentic/statue-base-neutral.webp" alt="" />
                 <img class="next-fig" id="wr-next-fig" src="./r/crest.png" alt="下张" />
                 <div class="next-cost-badge">
                   <img src="./r/hud/CombatHUD_Tex_Statue_Base_HUD_CostFrame.webp" alt="" />
                   <span id="wr-next-cost">0</span>
                 </div>
-                <span class="next-tag">下张</span>
               </div>
 
-              <!-- 4 Card Pedestal Slots -->
-              <div id="wr-hand-row" class="wr-hand-pedestal-row"></div>
-            </div>
+              <!-- Main Dark-Stone Box (Bevel + Engraved 1..4 Slots + Gold Meter) -->
+              <div class="wr-stone-tray-box">
+                <div class="wr-tray-numbers-bar">
+                  <span>1</span><span>2</span><span>3</span><span>4</span>
+                </div>
+                <div id="wr-hand-row" class="wr-hand-pedestal-row"></div>
 
-            <!-- Bottom 10-Ingot Gold Meter -->
-            <div class="wr-gold-hud-authentic">
-              <div class="wr-gold-plaque">
-                <img src="./r/hud/CombatHUD_Tex_GoldNugget_Highlight.webp" alt="金币" />
-                <span id="wr-gold-val">4</span>
-              </div>
-              <div id="wr-gold-bars" class="wr-gold-ingots-track">
-                ${Array.from(
-                  { length: 10 },
-                  () => `
-                  <div class="wr-gold-pocket">
-                    <div class="wr-gold-pocket-fill" style="width:0%"></div>
-                    <img class="wr-gold-pocket-nugget" src="./r/hud/CombatHUD_Tex_GoldNugget.webp" alt="" />
-                  </div>`
-                ).join('')}
+                <div class="wr-gold-hud-authentic">
+                  <div class="wr-gold-plaque">
+                    <img src="./r/hud/CombatHUD_Tex_GoldNugget_Highlight.webp" alt="金币" />
+                    <span id="wr-gold-val">4</span>
+                  </div>
+                  <div id="wr-gold-bars" class="wr-gold-ingots-track">
+                    ${Array.from(
+                      { length: 10 },
+                      () => `
+                      <div class="wr-gold-pocket">
+                        <div class="wr-gold-pocket-fill" style="width:0%"></div>
+                        <img class="wr-gold-pocket-nugget" src="./r/hud/CombatHUD_Tex_GoldNugget.webp" alt="" />
+                      </div>`
+                    ).join('')}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -247,8 +243,10 @@ export class BattleController {
     this.canvas = this.root.querySelector('#wr-battle-canvas');
     this.minimapCanvas = this.root.querySelector('#wr-minimap');
     this.overlaysEl = this.root.querySelector('#wr-world-overlays');
+    this.bubblesEl = this.root.querySelector('#wr-offscreen-bubbles');
     this.renderer = new BattleRenderer3D(this.canvas);
-    this.renderer.setFocusZ(4);
+    this.renderer.setFocusZ(10.5);
+    this.renderer.focusZ = 10.5;
 
     this._bindControls();
     this._syncHandUI(true);
@@ -298,10 +296,15 @@ export class BattleController {
     if (clientX < cRect.left || clientX > cRect.right || clientY < cRect.top || clientY > cRect.bottom) {
       return false;
     }
-    const topEl = this.root.querySelector('#wr-combat-top');
+    const elUnder = document.elementFromPoint(clientX, clientY);
+    if (elUnder && elUnder.closest?.('#wr-combat-top, #wr-combat-bottom, #wr-combat-aux, #wr-start-plunger, #wr-minimap-wrap')) {
+      return false;
+    }
     const botEl = this.root.querySelector('#wr-combat-bottom');
-    if (topEl && clientY <= topEl.getBoundingClientRect().bottom + 4) return false;
-    if (botEl && clientY >= botEl.getBoundingClientRect().top - 4) return false;
+    if (botEl && clientY >= botEl.getBoundingClientRect().top - 2) {
+      const bRect = botEl.getBoundingClientRect();
+      if (clientX >= bRect.left && clientX <= bRect.right) return false;
+    }
     return true;
   }
 
@@ -343,19 +346,29 @@ export class BattleController {
     const ghost = this.root.querySelector('#wr-drag-ghost');
     if (ghost) ghost.style.display = 'none';
 
-    // CRITICAL FIX ("玩不了"): Only attempt deploy if the player actually dragged onto the 3D battlefield!
-    // Simple clicks inside the bottom card tray NEVER attempt out-of-bounds deployment.
-    if (drag.moved && this._isPointOnBattlefield(e.clientX, e.clientY)) {
-      const world = this._getWorldPos(e.clientX, e.clientY);
-      const res = this.sim.deployCard(drag.slot, world.x, world.z);
-      if (res.ok) {
-        this.selectedSlot = null;
-        this.hoverWorld = null;
-        this._syncHandUI(true);
-      } else {
-        this.onToast?.(res.reason || '请部署在蓝色可部署区域内');
+    if (drag.moved) {
+      if (this._isPointOnBattlefield(e.clientX, e.clientY)) {
+        const world = this._getWorldPos(e.clientX, e.clientY);
+        const res = this.sim.deployCard(drag.slot, world.x, world.z);
+        if (res.ok) {
+          this.selectedSlot = null;
+          this.hoverWorld = null;
+          this._syncHandUI(true);
+        } else {
+          this.onToast?.(res.reason || '请部署在蓝色可部署区域内');
+        }
       }
+      return;
     }
+
+    // Simple click without drag: toggle slot selection cleanly (clicking same slot again deselects)
+    sfx.play('select');
+    if (drag.wasSelected) {
+      this.selectedSlot = null;
+    } else {
+      this.selectedSlot = drag.slot;
+    }
+    this._updateCardSelectionClasses();
   }
 
   _openPauseModal() {
@@ -372,8 +385,8 @@ export class BattleController {
           <button type="button" class="wr-gbtn green" id="wr-p-resume-main">继续战斗</button>
           <button type="button" class="wr-gbtn blue" id="wr-p-auto">${this.autopilot ? '关闭 AI 托管' : '开启 AI 托管'}</button>
           <div class="wr-pause-cam-row">
-            <button type="button" class="wr-diff-chip" data-cam-z="4">我方基地</button>
-            <button type="button" class="wr-diff-chip" data-cam-z="32">中路哨塔</button>
+            <button type="button" class="wr-diff-chip" data-cam-z="13">我方基地</button>
+            <button type="button" class="wr-diff-chip" data-cam-z="38">中路哨塔</button>
             <button type="button" class="wr-diff-chip" data-cam-z="64">首领王座</button>
           </div>
           <button type="button" class="wr-gbtn gold" id="wr-p-restart">重新开始</button>
@@ -426,7 +439,7 @@ export class BattleController {
     if (this.overlaysEl) this.overlaysEl.innerHTML = '';
     this.root.querySelector('#wr-start-plunger')?.classList.add('hidden');
     this.root.querySelector('#wr-combat-bottom')?.classList.remove('tray-hidden');
-    this.renderer?.setFocusZ(4);
+    this.renderer?.setFocusZ(10.5);
     this._syncHandUI(true);
   }
 
@@ -436,7 +449,7 @@ export class BattleController {
     this.root.querySelector('#wr-auto-btn').addEventListener('click', () => {
       this.autopilot = !this.autopilot;
       const btn = this.root.querySelector('#wr-auto-btn');
-      btn.textContent = this.autopilot ? 'AI 托管中' : 'AI 托管';
+      btn.textContent = this.autopilot ? '托管中' : 'AI 托管';
       btn.classList.toggle('active', this.autopilot);
       this.onToast?.(this.autopilot ? '已开启 AI 战术托管（可随时点击战场手动放兵）' : '已切换回手动操作');
     });
@@ -467,10 +480,9 @@ export class BattleController {
     });
 
     this.root.querySelector('#wr-offscreen-warn')?.addEventListener('click', () => {
-      this.renderer?.setFocusZ(4);
+      this.renderer?.setFocusZ(10.5);
     });
 
-    // Wheel scroll pans camera north/south
     this.canvas.addEventListener(
       'wheel',
       (e) => {
@@ -515,7 +527,7 @@ export class BattleController {
       const g = this._canvasGesture;
       this._panning = false;
       this._canvasGesture = null;
-      if (!g || g.moved >= 10) return; // Was a camera drag, not a tap
+      if (!g || g.moved >= 10) return;
 
       if (!this._isPointOnBattlefield(e.clientX, e.clientY)) return;
       const world = this._getWorldPos(e.clientX, e.clientY);
@@ -550,13 +562,12 @@ export class BattleController {
       this._canvasGesture = null;
     });
 
-    // Minimap scrub click & drag
     if (this.minimapCanvas) {
       let scrubbing = false;
       const jumpFromMinimap = (e) => {
         const rect = this.minimapCanvas.getBoundingClientRect();
         const t = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-        const zTarget = 2 + t * 74;
+        const zTarget = 10 + t * 58;
         this.renderer.setFocusZ(zTarget);
       };
       this.minimapCanvas.addEventListener('pointerdown', (e) => {
@@ -626,6 +637,7 @@ export class BattleController {
     });
 
     this._syncWorldOverlays();
+    this._syncOffscreenBubbles();
     if (this._minimapOpen) this._drawMinimap();
     this._syncHudUI();
     this._syncHandUI(false);
@@ -652,19 +664,20 @@ export class BattleController {
       if (!proj.visible) return;
       liveHpKeys.add(key);
 
+      const damaged = hp < maxHp - 1;
       let el = this._hpOverlayPool.get(key);
       if (!el) {
         el = document.createElement('div');
-        el.className = `wr-world-hp ${team} ${options.isStruct ? 'struct' : ''}`;
         el.innerHTML = `
-          <span class="lv-badge">${options.lv || playerLv}</span>
+          ${options.isBase ? `<img class="wing-bg" src="./r/hud/UnitHealthMeter_BaseBG.webp" alt="" />` : ''}
+          <span class="lv-num">${options.lv || playerLv}</span>
           <div class="bar"><div class="fill"></div></div>
         `;
         this.overlaysEl.appendChild(el);
         this._hpOverlayPool.set(key, el);
       }
-      el.className = `wr-world-hp ${team} ${options.isStruct ? 'struct' : ''}`;
-      const lvEl = el.querySelector('.lv-badge');
+      el.className = `wr-world-hp ${team} ${options.isStruct ? 'struct' : ''} ${options.isBase ? 'keep-wing' : ''} ${damaged ? 'damaged' : 'full'}`;
+      const lvEl = el.querySelector('.lv-num');
       if (lvEl) lvEl.textContent = String(options.lv || (team === 'player' ? playerLv : enemyLv));
       const pct = Math.max(0, Math.min(100, (hp / Math.max(1, maxHp)) * 100));
       el.querySelector('.fill').style.width = `${pct.toFixed(1)}%`;
@@ -676,12 +689,12 @@ export class BattleController {
         trackEntityBar(
           s.id,
           s.x,
-          s.kind === 'base' ? 6.0 : 5.2,
+          s.kind === 'base' ? 5.6 : 5.0,
           s.z,
           s.hp + (s.ragnarosShield || 0),
           s.maxHp + (s.ragnarosMaxShield || 0),
           s.team,
-          { isStruct: true, lv: s.team === 'player' ? playerLv : enemyLv }
+          { isStruct: true, isBase: s.kind === 'base', lv: s.team === 'player' ? playerLv : enemyLv }
         );
       }
     }
@@ -692,8 +705,7 @@ export class BattleController {
     }
     for (const u of this.sim.units || []) {
       if (!u.alive || u.attachedStructureId) continue;
-      // Show unit level + hp bar above active units (authentic battle-late.png look!)
-      const yOff = (u.isFlying ? 5.6 : 3.1) * (u.weight === 'heavy' ? 1.15 : 1.0);
+      const yOff = (u.isFlying ? 5.2 : 2.9) * (u.weight === 'heavy' ? 1.15 : 1.0);
       trackEntityBar(u.id, u.x, yOff, u.z, u.hp, u.maxHp, u.team, {
         lv: u.team === 'player' ? playerLv : enemyLv,
       });
@@ -732,6 +744,50 @@ export class BattleController {
         this._textOverlayPool.delete(k);
       }
     }
+  }
+
+  _syncOffscreenBubbles() {
+    if (!this.bubblesEl || !this.matchStarted) return;
+    const fz = this.renderer.getFocusZ();
+    const { w } = this.renderer.ensureSize();
+
+    // Group non-egg offscreen enemy threats above viewport (z > fz + 23)
+    const offTop = [];
+    for (const u of this.sim.units || []) {
+      if (!u.alive || u.team !== 'enemy' || u.isEgg) continue;
+      if (u.z > fz + 23) {
+        // Dedup horizontally nearby enemies so max ~3 bubbles show
+        if (!offTop.some((other) => Math.abs(other.x - u.x) < 5.5 && other.slug === u.slug)) {
+          offTop.push(u);
+        }
+      }
+    }
+
+    const shown = offTop.slice(0, 3);
+    if (shown.length === 0) {
+      if (this.bubblesEl.childElementCount > 0) this.bubblesEl.innerHTML = '';
+      return;
+    }
+
+    this.bubblesEl.innerHTML = shown
+      .map((u) => {
+        const proj = this.renderer.projectWorldToScreen(u.x, 2, fz + 18);
+        const clampedX = Math.max(46, Math.min(w - 46, proj.x || w * 0.5));
+        return `
+          <button type="button" class="wr-offscreen-bubble" style="left:${clampedX.toFixed(1)}px;" data-focus-z="${Math.round(u.z - 10)}" title="点击查看上方敌军">
+            <img class="ring" src="./r/hud/CombatHUD_Tex_OffscreenIndicator.webp" alt="" />
+            <img class="portrait" src="${esc(normalizeAssetPath(resolveMiniSprite(u.slug)))}" alt="" />
+          </button>
+        `;
+      })
+      .join('');
+
+    this.bubblesEl.querySelectorAll('[data-focus-z]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.renderer?.setFocusZ(Number(btn.dataset.focusZ));
+      });
+    });
   }
 
   _drawMinimap() {
@@ -783,8 +839,8 @@ export class BattleController {
     }
 
     const fz = this.renderer.getFocusZ();
-    const viewTopY = toMY(fz + 21);
-    const viewBotY = toMY(fz - 16);
+    const viewTopY = toMY(fz + 23);
+    const viewBotY = toMY(fz - 20);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(2, Math.max(1, viewTopY), w - 4, Math.max(16, viewBotY - viewTopY));
@@ -828,11 +884,6 @@ export class BattleController {
       timerEl.classList.toggle('overtime', snap.inOvertime);
     }
 
-    const eggEl = this.root.querySelector('#wr-egg-timer');
-    if (eggEl && isOnyxia) {
-      eggEl.textContent = snap.nextEggSec != null ? `龙蛋 ${formatClock(snap.nextEggSec)}` : '末期阶段';
-    }
-
     const traitsEl = this.root.querySelector('#wr-boss-traits');
     if (traitsEl) {
       let html = '';
@@ -865,7 +916,7 @@ export class BattleController {
     if (warnEl) {
       const fz = this.renderer.getFocusZ();
       const nearBase = this.sim.units.some((u) => u.alive && u.team === 'enemy' && !u.isEgg && u.z < 20);
-      warnEl.style.display = nearBase && fz > 28 ? '' : 'none';
+      warnEl.style.display = nearBase && fz > 30 ? '' : 'none';
     }
 
     const goldVal = this.root.querySelector('#wr-gold-val');
@@ -899,7 +950,6 @@ export class BattleController {
     const handRow = this.root.querySelector('#wr-hand-row');
     if (!handRow) return;
 
-    // Exclude selectedSlot from handKey so clicking a card NEVER destroys DOM / pointer events!
     const handKey = `${this.sim.hand.map((c) => `${c.slug}:${c.talentIndex}`).join('|')}>${this.sim.nextCard?.slug}`;
 
     if (forceRebuild || handKey !== this.lastHandKey) {
@@ -929,11 +979,10 @@ export class BattleController {
               type="button"
               class="wr-statue-slot ${selected ? 'selected' : ''} ${affordable ? 'affordable' : 'unaffordable'}"
               data-hand-slot="${idx}"
-              title="${esc(spec.nameZh)}（${spec.cost}金）— 点击选中再点战场，或直接拖入战场"
+              title="${esc(spec.nameZh)}（${spec.cost}金）— 点击选中再点战场，或拖入战场部署"
             >
               <img class="slot-hole" src="./r/hud/CombatHUD_Tex_Tray_Hole.webp" alt="" />
               <img class="slot-pedestal" src="${esc(baseImg)}" alt="" />
-              <img class="slot-glow" src="./r/hud/CombatHUD_Tex_Statue_Base_HUD_Glow.webp" alt="" />
               <img class="slot-ready-ring" src="./r/hud/CombatHUD_Tex_Statue_Base_HUD_On.webp" alt="" />
               ${isLeader ? `<img class="slot-crown" src="./r/authentic/leader-crown.webp" alt="" />` : ''}
               <img class="slot-fig" src="${esc(normalizeAssetPath(spec.sprite))}" alt="${esc(spec.nameZh)}" />
@@ -958,9 +1007,6 @@ export class BattleController {
         btn.addEventListener('pointerdown', (e) => {
           e.stopPropagation();
           if (!this.matchStarted) return;
-          sfx.play('select');
-          this.selectedSlot = idx;
-          this._updateCardSelectionClasses();
 
           const spec = this.sim.getHandCardSpec(idx);
           const ghost = this.root.querySelector('#wr-drag-ghost');
@@ -974,6 +1020,7 @@ export class BattleController {
             startX: e.clientX,
             startY: e.clientY,
             moved: false,
+            wasSelected: this.selectedSlot === idx,
           };
         });
         btn.addEventListener('click', (e) => e.stopPropagation());
