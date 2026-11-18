@@ -10,12 +10,13 @@ export const ONYXIA_ARMY_POOL = [
   { slug: 'warsong-grunts', talentIndex: 1 },
 ];
 
-export function createOnyxiaAiState() {
+export function createOnyxiaAiState(mission = null) {
   return {
     thinkTimer: 1.8,
     deckIdx: 0,
     minerCooldown: 4.5,
     gargoyleCooldown: 14.0,
+    armyPool: Array.isArray(mission?.armyPool) && mission.armyPool.length > 0 ? mission.armyPool : ONYXIA_ARMY_POOL,
   };
 }
 
@@ -104,7 +105,8 @@ export function tickOnyxiaAi(sim, dt) {
     preferSide = sim.rng.next() < 0.5 ? 'left' : 'right';
     ai.gargoyleCooldown = 28.0;
   } else if (boss.gold >= 4.5) {
-    chosenCard = ONYXIA_ARMY_POOL[ai.deckIdx % ONYXIA_ARMY_POOL.length];
+    const pool = ai.armyPool || ONYXIA_ARMY_POOL;
+    chosenCard = pool[ai.deckIdx % pool.length];
     ai.deckIdx += 1;
   }
 

@@ -66,8 +66,9 @@ export class BattleRenderer3D {
     this.scene.fog = new THREE.FogExp2(0x140a0d, 0.0052);
 
     this.camera = new THREE.PerspectiveCamera(38, 9 / 16, 1.0, 280);
-    this.focusZ = 16;
-    this.targetFocusZ = 16;
+    this.focusZ = 4;
+    this.targetFocusZ = 4;
+    this._loadedBossGlb = null;
 
     this._raycaster = new THREE.Raycaster();
     this._groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -117,7 +118,7 @@ export class BattleRenderer3D {
     this._setupLavaAndEmbers();
     this._setupDeployReticle();
     this._loadStaticEnvironment();
-    this._loadBossModel();
+    this._loadBossModel('./r/3d/poi/onyxia-boss.glb', 1.0);
   }
 
   _setupLighting() {
@@ -289,25 +290,36 @@ export class BattleRenderer3D {
     }
   }
 
-  async _loadBossModel() {
+  async _loadBossModel(url = './r/3d/poi/onyxia-boss.glb', bossScale = 1.0) {
+    if (this._loadedBossGlb === url) return;
+    this._loadedBossGlb = url;
     try {
-      const url = this.manifest.poi?.['onyxia-boss']?.glb || './r/3d/poi/onyxia-boss.glb';
       const tpl = await loadGlbTemplate(url);
       if (this.disposed) return;
+      if (this._bossNode) {
+        this.bossGroup.remove(this._bossNode);
+        disposeClonedMaterials(this._bossNode);
+        this._bossNode = null;
+      }
       const boss = cloneSceneWithUniqueMaterials(tpl);
       boss.position.set(ONYXIA_POS.x, 0.0, -ONYXIA_POS.z);
+      boss.userData.baseScale = bossScale;
+      if (bossScale !== 1.0) {
+        boss.scale.setScalar(bossScale);
+      }
 
       const auraGeo = new THREE.RingGeometry(7.2, 8.6, 48);
       auraGeo.rotateX(-Math.PI / 2);
       const auraMat = new THREE.MeshBasicMaterial({
         color: 0xf97316,
         transparent: true,
-        opacity: 0.35,
+        opacity: 0.42,
         side: THREE.DoubleSide,
         depthWrite: false,
       });
       const aura = new THREE.Mesh(auraGeo, auraMat);
-      aura.position.y = 0.12;
+      aura.position.y = 0.14;
+      aura.scale.setScalar(1 / Math.max(0.5, bossScale));
       boss.add(aura);
       boss.userData.auraMat = auraMat;
       boss.userData.ownedMaterials.push(auraMat);
@@ -315,7 +327,7 @@ export class BattleRenderer3D {
       this.bossGroup.add(boss);
       this._bossNode = boss;
     } catch (err) {
-      console.warn('Failed to load Onyxia boss model:', err);
+      console.warn('Failed to load boss model:', url, err);
     }
   }
 
@@ -324,7 +336,7 @@ export class BattleRenderer3D {
   }
 
   setFocusZ(z) {
-    this.targetFocusZ = Math.max(4, Math.min(72, z));
+    this.targetFocusZ = Math.max(2, Math.min(76, z));
   }
 
   panByDeltaZ(dz) {
@@ -401,8 +413,12 @@ export class BattleRenderer3D {
     const shakeX = shakeAmt > 0 ? Math.sin(this._time * 47) * shakeAmt : 0;
     const shakeY = shakeAmt > 0 ? Math.cos(this._time * 39) * shakeAmt * 0.6 : 0;
 
-    this.camera.position.set(shakeX, 42 + shakeY, -this.focusZ + 29);
-    this.camera.lookAt(shakeX * 0.35, 0, -this.focusZ - 5.5);
+    this.camera.position.set(shakeX, 46 + shakeY, -this.focusZ + 18.5);
+    this.camera.lookAt(shakeX * 0.35, 0, -this.focusZ - 2.5);
+
+    if (sim.mission?.bossGlb && sim.mission.bossGlb !== this._loadedBossGlb) {
+      this._loadBossModel(sim.mission.bossGlb, sim.mission.bossScale || 2.35);
+    }
 
     this._syncStructures(sim);
     this._syncMines(sim);
@@ -669,10 +685,15 @@ export class BattleRenderer3D {
     if (!boss.alive) return;
 
     // Breathing & breath lunge animation
+    const baseScale = this._bossNode.userData?.baseScale || 1.0;
     const breathPulse = Math.sin(this._time * 2.2) * 0.025;
     const lungeProgress = boss.attackAnimTimer > 0 ? Math.sin((boss.attackAnimTimer / 0.65) * Math.PI) : 0;
     this._bossNode.position.set(boss.x, 0, -boss.z + lungeProgress * 1.4);
-    this._bossNode.scale.set(1 + breathPulse * 0.5, 1 + breathPulse, 1 + breathPulse * 0.5);
+    this._bossNode.scale.set(
+      baseScale * (1 + breathPulse * 0.5),
+      baseScale * (1 + breathPulse),
+      baseScale * (1 + breathPulse * 0.5)
+    );
 
     const aimOffset = THREE.MathUtils.clamp((boss.yaw || Math.PI) - Math.PI, -0.45, 0.45);
     this._bossNode.rotation.y = -aimOffset;

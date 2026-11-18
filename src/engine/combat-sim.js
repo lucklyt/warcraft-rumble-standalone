@@ -24,6 +24,7 @@ import {
 } from './unit-behaviors.js';
 import { createOnyxiaBoss, getNextEggCountdown, tickOnyxiaBoss } from './onyxia-boss.js';
 import { createOnyxiaAiState, tickOnyxiaAi } from './onyxia-ai.js';
+import { getMissionById } from '../data/missions-catalog.js';
 
 export const TICK_DT = 0.05; // 20 Hz deterministic simulation
 export const REGULATION_DURATION = 360; // 6:00
@@ -35,10 +36,13 @@ export class CombatSimulation {
   constructor(options = {}) {
     const {
       deck,
+      missionId = 'onyxia_lair',
       playerLevelDelta = 0,
       enemyLevelDelta = 0,
       seed = 20261118,
     } = options;
+
+    this.mission = getMissionById(missionId);
 
     if (!deck || !deck.leader || !Array.isArray(deck.troops) || deck.troops.length !== 6) {
       throw new Error('CombatSimulation requires a valid deck with 1 leader and 6 troops.');
@@ -87,8 +91,8 @@ export class CombatSimulation {
     this.chests = INITIAL_CHESTS.map((c) => ({ ...c, isChest: true }));
     this.switches = structuredClone(INITIAL_SWITCHES);
 
-    this.boss = createOnyxiaBoss(enemyLevelDelta);
-    this.ai = createOnyxiaAiState();
+    this.boss = createOnyxiaBoss(enemyLevelDelta, this.mission);
+    this.ai = createOnyxiaAiState(this.mission);
 
     this.units = [];
     this.projectiles = [];
@@ -98,9 +102,12 @@ export class CombatSimulation {
     this.floatingTexts = [];
     this.audioQueue = [];
 
-    this.banner = { text: '奥妮克希亚的巢穴 · 战斗开始！夺取中路哨塔并控制金矿！', timer: 3.5 };
+    this.banner = {
+      text: this.mission?.bannerText || '奥妮克希亚的巢穴 · 战斗开始！夺取中路哨塔并控制金矿！',
+      timer: 3.5,
+    };
     this.bossTaunt = {
-      text: ONYXIA_TAUNTS[0] || '真走运……我的下一餐自己送上门来了。',
+      text: this.mission?.tauntText || ONYXIA_TAUNTS[0] || '真走运……我的下一餐自己送上门来了。',
       mood: 'smug',
       timer: 4.5,
     };
@@ -1039,6 +1046,7 @@ export class CombatSimulation {
       finished: this.finished,
       victory: this.victory,
       defeatReason: this.defeatReason,
+      mission: this.mission,
       playerGold: this.playerGold,
       maxGold: this.maxGold,
       bossHp: this.boss.hp,

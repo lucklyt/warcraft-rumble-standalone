@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { PRESET_DECKS, USER_DEFAULT_THRALL_CODE, getDifficultyById } from '../src/data/presets.js';
+import { MISSIONS_CATALOG, getMissionById } from '../src/data/missions-catalog.js';
 import { decodeRumblo } from '../src/services/rumblo.js';
 import { CombatSimulation, TICK_DT } from '../src/engine/combat-sim.js';
 import { tickPlayerAutopilot } from '../src/engine/player-autopilot.js';
@@ -252,4 +253,19 @@ test('Full-match practice autopilot with User Default Thrall deck clears Onyxia 
     true,
     `Expected Thrall practice autopilot to defeat Onyxia, ended at P${snap.bossPhase} (${snap.bossHpPct.toFixed(1)}% HP, reason=${snap.defeatReason})`
   );
+});
+
+test('All Campaign, Raid, Quest, and PvP missions simulate cleanly and allow card deploy in Player Deploy', () => {
+  const deck = decodeRumblo(USER_DEFAULT_THRALL_CODE);
+  for (const mission of MISSIONS_CATALOG) {
+    const sim = new CombatSimulation({ deck, missionId: mission.id, seed: 555 });
+    assert.equal(sim.boss.nameZh, mission.nameZh);
+    assert.equal(sim.boss.maxHp, mission.maxHp);
+    sim.playerGold = 10;
+    const res = sim.deployCard(0, 0, 5.5);
+    assert.equal(res.ok, true, `Failed to deploy slot 0 on ${mission.id}: ${res.reason}`);
+    for (let i = 0; i < 40; i++) sim.step(TICK_DT);
+    assert.ok(Number.isFinite(sim.boss.hp));
+  }
+  assert.equal(getMissionById('nonexistent').id, 'onyxia_lair');
 });

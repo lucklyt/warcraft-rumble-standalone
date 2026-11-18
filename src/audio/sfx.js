@@ -1,11 +1,48 @@
+const SAMPLE_MAP = {
+  click: './r/audio/ui-click.mp3',
+  select: './r/audio/ui-select.mp3',
+  start: './r/audio/ui-start.mp3',
+  deploy: './r/audio/ui-deploy.mp3',
+  victory: './r/audio/ui-victory.mp3',
+  gold: './r/audio/gold-coin.mp3',
+};
+
 class SoundEngine {
   constructor() {
     this.ctx = null;
     this.muted = false;
+    this._audioPools = new Map();
   }
 
   setMuted(muted) {
     this.muted = Boolean(muted);
+  }
+
+  _playSample(key, volume = 0.45) {
+    if (this.muted || typeof Audio === 'undefined') return false;
+    const url = SAMPLE_MAP[key];
+    if (!url) return false;
+    try {
+      let pool = this._audioPools.get(key);
+      if (!pool) {
+        pool = [];
+        this._audioPools.set(key, pool);
+      }
+      let audio = pool.find((a) => a.paused || a.ended);
+      if (!audio && pool.length < 4) {
+        audio = new Audio(url);
+        audio.preload = 'auto';
+        pool.push(audio);
+      }
+      if (!audio) audio = pool[0];
+      audio.volume = volume;
+      audio.currentTime = 0;
+      const p = audio.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   _ensureCtx() {
@@ -41,11 +78,24 @@ class SoundEngine {
   play(eventName) {
     if (this.muted) return;
     switch (eventName) {
+      case 'click':
+        this._playSample('click', 0.35);
+        break;
+      case 'select':
+        this._playSample('select', 0.4);
+        break;
+      case 'start':
+        this._playSample('start', 0.55);
+        break;
       case 'deploy':
-        this._tone(240, 360, 0.11, 'triangle', 0.09);
+        if (!this._playSample('deploy', 0.42)) {
+          this._tone(240, 360, 0.11, 'triangle', 0.09);
+        }
         break;
       case 'gold':
-        this._tone(880, 1320, 0.14, 'sine', 0.08);
+        if (!this._playSample('gold', 0.38)) {
+          this._tone(880, 1320, 0.14, 'sine', 0.08);
+        }
         break;
       case 'switch':
         this._tone(520, 680, 0.08, 'sine', 0.06);
@@ -70,7 +120,7 @@ class SoundEngine {
         this._tone(660, 440, 0.22, 'square', 0.06);
         break;
       case 'victory':
-        this._tone(523, 784, 0.45, 'triangle', 0.11);
+        this._playSample('victory', 0.6);
         break;
       case 'defeat':
         this._tone(220, 95, 0.55, 'sawtooth', 0.1);

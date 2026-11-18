@@ -10,18 +10,22 @@ import {
 } from './onyxia-map.js';
 import { getLevelMultiplier, getUnitCombatSpec } from './unit-stats.js';
 
-export function createOnyxiaBoss(levelDelta = 0) {
+export function createOnyxiaBoss(levelDelta = 0, mission = null) {
   const scale = getLevelMultiplier(levelDelta);
-  const maxHp = Math.round(18000 * scale);
+  const isOnyxia = !mission || mission.id === 'onyxia_lair';
+  const baseHp = isOnyxia ? 18000 : mission.maxHp || 11000;
+  const baseDmg = isOnyxia ? 375 : mission.damage || 250;
+  const maxHp = Math.round(baseHp * scale);
   return {
-    id: 'boss-onyxia',
-    slug: 'onyxia',
-    nameZh: '奥妮克希亚',
+    id: `boss-${mission?.bossSlug || 'onyxia'}`,
+    slug: isOnyxia ? 'onyxia' : mission.bossSlug || 'onyxia',
+    nameZh: isOnyxia ? '奥妮克希亚' : mission.nameZh || '敌方首领',
     team: 'enemy',
     isBoss: true,
     isStructure: false,
     isUnstoppable: true,
     isDetect: true,
+    hasPhases: isOnyxia ? true : Boolean(mission?.hasPhases),
     alive: true,
     x: ONYXIA_POS.x,
     z: ONYXIA_POS.z,
@@ -29,17 +33,17 @@ export function createOnyxiaBoss(levelDelta = 0) {
     yaw: 0, // Faces South (toward -Z in sim / +Z_three)
     hp: maxHp,
     maxHp,
-    damage: Math.round(375 * scale),
-    range: 12.0, // Plus boss.radius (8.0) -> 20.0m reach from (0, 78.5)
-    attackInterval: 2.5,
+    damage: Math.round(baseDmg * scale),
+    range: isOnyxia ? 12.0 : mission?.range || 6.5, // Plus boss.radius (8.0)
+    attackInterval: isOnyxia ? 2.5 : 2.1,
     attackCooldown: 1.0,
     attackAnimTimer: 0,
     phase: 1,
     hasResistant: false,
     hasArmored: false,
     gold: 4.0,
-    goldPerSec: 0.20,
-    eggSchedule: [20, 110, 200, 290, 380, 470],
+    goldPerSec: isOnyxia ? 0.20 : mission?.goldPerSec || 0.20,
+    eggSchedule: isOnyxia ? [20, 110, 200, 290, 380, 470] : [],
     eggWaveIndex: 0,
     collapseTimer: 9999,
     warderTimer: 9999,
@@ -185,7 +189,7 @@ export function tickOnyxiaBoss(sim, dt) {
     boss.elementalVulnTimer = 0;
   };
 
-  if (boss.phase === 1 && hpPct <= 70) {
+  if (boss.hasPhases && boss.phase === 1 && hpPct <= 70) {
     boss.phase = 2;
     boss.hasResistant = true;
     boss.goldPerSec = 0.30;
@@ -201,7 +205,7 @@ export function tickOnyxiaBoss(sim, dt) {
     boss.collapseTimer = 50.0;
   }
 
-  if (boss.phase < 3 && hpPct <= 40) {
+  if (boss.hasPhases && boss.phase < 3 && hpPct <= 40) {
     boss.phase = 3;
     boss.hasResistant = true;
     boss.hasArmored = true;
@@ -218,13 +222,13 @@ export function tickOnyxiaBoss(sim, dt) {
     boss.warderTimer = 80.0;
   }
 
-  while (boss.eggWaveIndex < boss.eggSchedule.length && sim.elapsedTime >= boss.eggSchedule[boss.eggWaveIndex]) {
+  while (boss.hasPhases && boss.eggWaveIndex < boss.eggSchedule.length && sim.elapsedTime >= boss.eggSchedule[boss.eggWaveIndex]) {
     const waveIdx = boss.eggWaveIndex;
     boss.eggWaveIndex += 1;
     spawnOnyxiaEggWave(sim, levelDelta, waveIdx);
   }
 
-  if (boss.phase >= 2) {
+  if (boss.hasPhases && boss.phase >= 2) {
     boss.collapseTimer -= dt;
     if (boss.collapseTimer <= 0) {
       boss.collapseTimer = 50.0;
@@ -232,7 +236,7 @@ export function tickOnyxiaBoss(sim, dt) {
     }
   }
 
-  if (boss.phase >= 3) {
+  if (boss.hasPhases && boss.phase >= 3) {
     boss.warderTimer -= dt;
     if (boss.warderTimer <= 0) {
       boss.warderTimer = 80.0;

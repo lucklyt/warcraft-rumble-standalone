@@ -215,6 +215,32 @@ export function resolvePortraitSprite(slug) {
   return resolveMiniSprite(slug);
 }
 
+const SPLIT_STATUE_BASES = new Map([
+  ['Horde|Blackrock', './r/authentic/statue-base-split-horde-blackrock.webp'],
+  ['Blackrock|Horde', './r/authentic/statue-base-split-blackrock-horde.webp'],
+  ['Alliance|Undead', './r/authentic/statue-base-split-alliance-undead.webp'],
+  ['Undead|Alliance', './r/authentic/statue-base-split-alliance-undead.webp'],
+  ['Alliance|Cenarion', './r/authentic/statue-base-split-alliance-cenarion.webp'],
+  ['Cenarion|Alliance', './r/authentic/statue-base-split-alliance-cenarion.webp'],
+  ['Beast|Blackrock', './r/authentic/statue-base-split-beast-blackrock.webp'],
+  ['Blackrock|Beast', './r/authentic/statue-base-split-beast-blackrock.webp'],
+  ['Undead|Beast', './r/authentic/statue-base-split-undead-beast.webp'],
+  ['Beast|Undead', './r/authentic/statue-base-split-undead-beast.webp'],
+  ['Undead|Horde', './r/authentic/statue-base-split-undead-horde.webp'],
+  ['Horde|Undead', './r/authentic/statue-base-split-undead-horde.webp'],
+]);
+
+export function resolveStatueBase(families = []) {
+  const list = Array.isArray(families) && families.length > 0 ? families : ['Neutral'];
+  if (list.length >= 2) {
+    const key = `${list[0]}|${list[1]}`;
+    if (SPLIT_STATUE_BASES.has(key)) return SPLIT_STATUE_BASES.get(key);
+  }
+  const fam = String(list[0] || 'Neutral').toLowerCase();
+  const valid = new Set(['alliance', 'horde', 'blackrock', 'beast', 'undead', 'cenarion', 'neutral']);
+  return valid.has(fam) ? `./r/authentic/statue-base-${fam}.webp` : './r/authentic/statue-base-neutral.webp';
+}
+
 /**
  * Strictly maps share-code talentIndex to the mini.talents entry using t.codeIndex.
  * Never confuse UI array position with protobuf codeIndex!
